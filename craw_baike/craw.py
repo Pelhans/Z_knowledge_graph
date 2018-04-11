@@ -66,6 +66,9 @@ class HTMLParser(object):
         summary_node = soup.find("div", class_ = "lemma-summary")
         res_data["summary"] = summary_node.get_text()
 
+        basic_node = soup.find("div", class_ = "basic-info cmn-clearfix")
+        res_data["basic"] = basic_node.get_text()
+
         return res_data
 
     def parse(self, page_url, HTML_cont ):
@@ -87,7 +90,7 @@ class HTMLOutputer(object):
         self.datas.append(data)
 
     def output_HTML(self):
-        fout = open("baike_spider_output.HTML", "w")
+        fout = open("../../pfile/baike_spider_output.HTML", "w")
         fout.write("<HTML>")
         fout.write('<meta charset="utf-8">')
         fout.write("<head>")
@@ -101,6 +104,7 @@ class HTMLOutputer(object):
             fout.write("<td>%s</td>" % data["url"])
             fout.write("<td><ahref='%s'>%s</a></td>" %(data["url"].encode("utf-8"),data["title"].encode("utf-8")))
             fout.write("<td>%s</td>" %data["summary"].encode("utf-8"))
+            fout.write("<td>%s</td>" %data["basic"].encode("utf-8"))
             fout.write("</tr>")
         fout.write("</table>")
         fout.write("</body>")
