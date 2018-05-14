@@ -73,12 +73,24 @@ class HTMLParser(object):
 
     def _get_new_data(self, page_url, soup, count):
         res_data = {}
+        basic = {
+            id : None,
+            u'中文名': None,
+            u'外文名': None,
+            u'国籍': None,
+            u'星座': None,
+            u'出生地': None,
+            u'出生日期': None,
+            u'代表作品': None,
+            u'主要成就' : None,
+            u'经纪公司': None
+        }
 
         open_tag = soup.find_all("span", class_ = "taglist")
         tag = self._get_from_findall(open_tag)
 
         #if actor in tag or movie in tag : 
-        if movie in tag : 
+        if actor in tag : 
             res_data["url"] = page_url
             title_node = soup.find("dd", class_ = "lemmaWgt-lemmaTitle-title").find("h1")
             res_data["title"] = title_node.get_text()
@@ -86,12 +98,23 @@ class HTMLParser(object):
             res_data["summary"] = summary_node.get_text()
     
             basic_node = soup.find("div", class_ = "basic-info cmn-clearfix")
-            res_data["basic"] = basic_node.get_text()
+            all_basicInfo_item = soup.find_all("dt", class_ = "basicInfo-item name" )
+            basic_item = self._get_from_findall(all_basicInfo_item)
+            basic_item = [s.strip() for s in basic_item]
+            all_basicInfo_value = soup.find_all("dd", class_ = "basicInfo-item value" )
+            basic_value = self._get_from_findall(all_basicInfo_value)
+            basic_value = [s.strip() for s in basic_value]
+
+            for i, item in enumerate(basic_item):
+                if basic.has_key(item):
+                    basic[item] = basic_value[i]
+           
+            #res_data["basic"] = basic_node.get_text()
             count = count + 1
 
-            return res_data, count
+            return res_data, basic, count
         else:
-            return None, count
+            return None, None, count
 
     def parse(self, page_url, HTML_cont, count):
         if page_url is None or HTML_cont is None:
@@ -99,7 +122,7 @@ class HTMLParser(object):
 
         soup = BeautifulSoup(HTML_cont, "html.parser", from_encoding="utf-8")
         new_urls = self._get_new_urls(page_url, soup)
-        new_data, count = self._get_new_data(page_url, soup, count)
+        new_data, _, count = self._get_new_data(page_url, soup, count)
         return new_urls, new_data, count
 
 class HTMLOutputer(object):
@@ -131,6 +154,27 @@ class HTMLOutputer(object):
         fout.write("</table>")
         fout.write("</body>")
         fout.write("</HTML>")
+
+    def _get_actor_tag(self):
+        actor_list = ()
+
+        actor_bio = data["summary"].encode("utf-8")
+        actor_chName = data["title"].encode("utf-8")
+
+        where_foreName = data["basic"].find(u"外文名")
+        actor_foreName = data["basic"][where_foreName + 4: ]
+
+        where_nationality = data["basic"].find(u"国籍")
+        where_constellation = data["basic"].find(u"星座")
+        where_birthPlace = data["basic"].find(u"出生地")
+        where_birthDay = data["basic"].find(u"出生日期")
+        where_repWorks = data["basic"].find(u"代表作品")
+        where_achiem = data["basic"].find(u"主要成就")
+        where_brokerage = data["basic"].find(u"经纪公司")
+
+
+        actor_list = ()
+        return 0
 
 
 class SpiderMain():
