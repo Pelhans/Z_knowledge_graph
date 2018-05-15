@@ -5,20 +5,28 @@ from bs4 import BeautifulSoup
 import re
 import urlparse
 import urllib2
-import os
+import sys, os
 import pymysql
+import basic_info
 
-actor = u'\n\u6f14\u5458\n' #line 81 
+actor = u'\n\u6f14\u5458\n' #line 91 演员的unicode 码,下面是电影的
 movie = u'\n\u7535\u5f71\n'
+
+basic_attr = {}
+basic_list = []
+target = sys.argv[1]
+if target == 'actor':
+    target = actor
+    basic_attr = basic_info.actor_attr
+    basic_list = basic_info.actor_info
+elif target == 'movie':
+    target = movie
+    basic_attr = basic_info.movie_attr
+    basic_list = basic_info.movie_info
 
 mysql_db = pymysql.connect(host="localhost", user="root", passwd='nlp', db="kg_movie", use_unicode=True, charset="utf8mb4")
 mysql_cursor = mysql_db.cursor()
     
-insert_actor_command = 'INSERT INTO actor (actor_id, actor_bio, actor_chName, actor_foreName, actor_nationality, actor_constellation, actor_birthPlace, actor_birthDay, actor_repWorks, actor_achiem, actor_brokerage ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) '
-insert_movie_command = 'INSERT INTO movie (movie_id, movie_bio, movie_chName, movie_foreName, movie_prodTime, movie_prodCompany, movie_director, movie_screenwriter, movie_genre, movie_star, movie_length, movie_rekeaseTime, movie_language, movie_achiem ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) '
-insert_actor_movie_command = 'INSERT INTO actor_to_movie (actor_id, movid_id ) VALUES (%s, %s) ' 
-insert_movie_genre_command = 'INSERT INTO movie_to_genre (movie_id, genre_id ) VALUES (%s, %s) ' # id 是整数，pymysql不支持%i %d这种，都用%s
-
 # manage the url
 class UrlManager(object):
     def __init__(self):
@@ -63,7 +71,6 @@ class HTMLParser(object):
         new_urls = []
 
         links = soup.find_all('a', href=re.compile(r"/item/"))
-#        links = soup.find_all('a', href=re.compile(r"/item/"))
         for link in links:
             new_url = link["href"]
             new_full_url = urlparse.urljoin(page_url, new_url)
@@ -80,32 +87,20 @@ class HTMLParser(object):
 
     def dict_to_list(self, basic):
         detail_list = list()
-        actor_info = [u'id', u'简介',  u'中文名', u'外文名', u'国籍', u'星座', u'出生地', u'出生日期', u'代表作品', u'主要成就', u'经纪公司']
+        #actor_info = basic.keys() # dict不能保证 key按照初始化时的顺序存储
 
-        for tag in actor_info:
+        for tag in basic_list:
             detail_list.append(basic[tag])
         return tuple(detail_list)
 
     def _get_new_data(self, soup, count):
-        basic = {
-            u'id' : int,
-            u'简介': None,
-            u'中文名': None,
-            u'外文名': None,
-            u'国籍': None,
-            u'星座': None,
-            u'出生地': None,
-            u'出生日期': None,
-            u'代表作品': None,
-            u'主要成就' : None,
-            u'经纪公司': None
-        }
-
+        basic = basic_attr
+        
         open_tag = soup.find_all("span", class_ = "taglist")
         tag = self._get_from_findall(open_tag)
 
         #if actor in tag or movie in tag : 
-        if actor in tag : 
+        if target in tag : 
             summary_node = soup.find("div", class_ = "lemma-summary")
             basic[u'简介'] = summary_node.get_text().replace("\n"," ")
             basic['id'] = count
@@ -140,37 +135,10 @@ class HTMLParser(object):
         return new_urls, new_data, count
 
 class HTMLOutputer(object):
-    def __init__(self):
-        self.datas = []
-    
     def collect_data(self, data):
         if data is None:
             return None
-
-        mysql_cursor.execute(insert_actor_command, data)
-
-        #self.datas.append(data)
-
-    def output_HTML(self):
-        fout = open("baike_spider_output.HTML", "w")
-        fout.write("<HTML>")
-        fout.write('<meta charset="utf-8">')
-        fout.write("<head>")
-        fout.write("<title>百度百科Python页面爬取相关数据</title>")
-        fout.write("</head>")
-        fout.write("<body>")
-        fout.write('<h1style="text-align:center">在百度百科中爬取相关数据展示</h1>')
-        fout.write("<table>")
-        for data in self.datas:
-            fout.write("<tr>")
-            fout.write("<td>%s</td>" % data["url"])
-            fout.write("<td><ahref='%s'>%s</a></td>" %(data["url"].encode("utf-8"),data["title"].encode("utf-8")))
-            fout.write("<td>%s</td>" %data["summary"].encode("utf-8"))
-            #fout.write("<td>%s</td>" %data["basic"].encode("utf-8"))
-            fout.write("</tr>")
-        fout.write("</table>")
-        fout.write("</body>")
-        fout.write("</HTML>")
+        mysql_cursor.execute(basic_info.insert_actor_command, data) # 将获得的数据插入到Mysql数据库中
 
 class SpiderMain():
     def craw(self, root_url, page_counts):
@@ -178,14 +146,12 @@ class SpiderMain():
         UrlManager.add_new_url(root_url)
         while UrlManager.has_new_url(): # still has url
             new_url =UrlManager.get_new_url()
-            #print "\ncrawed %d :%s" % (count, new_url)
             HTML_cont =HTMLDownloader.download(new_url)
             new_urls, new_data, count =HTMLParser.parse(new_url, HTML_cont, count)
             UrlManager.add_new_urls(new_urls)
             HTMLOutputer.collect_data(new_data)
             if count == page_counts+1:
                 break
-        #HTMLOutputer.output_HTML()
 
 if __name__=="__main__":
     mysql_cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
@@ -206,4 +172,3 @@ if __name__=="__main__":
     mysql_cursor.close()
     mysql_db.close()
 
-    print"\nCraw is done, please go to"+os.path.dirname(os.path.abspath('__file__')) + " to see the resultin baike_spider_output.HTML"
