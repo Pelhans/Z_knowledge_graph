@@ -11,6 +11,14 @@ import pymysql
 actor = u'\n\u6f14\u5458\n' #line 81 
 movie = u'\n\u7535\u5f71\n'
 
+mysql_db = pymysql.connect(host="localhost", user="root", passwd='nlp', db="kg_movie", use_unicode=True, charset="utf8mb4")
+mysql_cursor = mysql_db.cursor()
+    
+insert_actor_command = 'INSERT INTO actor (actor_id, actor_bio, actor_chName, actor_foreName, actor_nationality, actor_constellation, actor_birthPlace, actor_birthDay, actor_repWorks, actor_achiem, actor_brokerage ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) '
+insert_movie_command = 'INSERT INTO movie (movie_id, movie_bio, movie_chName, movie_foreName, movie_prodTime, movie_prodCompany, movie_director, movie_screenwriter, movie_genre, movie_star, movie_length, movie_rekeaseTime, movie_language, movie_achiem ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) '
+insert_actor_movie_command = 'INSERT INTO actor_to_movie (actor_id, movid_id ) VALUES (%s, %s) ' 
+insert_movie_genre_command = 'INSERT INTO movie_to_genre (movie_id, genre_id ) VALUES (%s, %s) ' # id 是整数，pymysql不支持%i %d这种，都用%s
+
 # manage the url
 class UrlManager(object):
     def __init__(self):
@@ -70,11 +78,18 @@ class HTMLParser(object):
             result.append(tmp)
         return result
 
+    def dict_to_list(self, basic):
+        detail_list = list()
+        actor_info = [u'id', u'简介',  u'中文名', u'外文名', u'国籍', u'星座', u'出生地', u'出生日期', u'代表作品', u'主要成就', u'经纪公司']
 
-    def _get_new_data(self, page_url, soup, count):
-        res_data = {}
+        for tag in actor_info:
+            detail_list.append(basic[tag])
+        return tuple(detail_list)
+
+    def _get_new_data(self, soup, count):
         basic = {
-            id : None,
+            u'id' : int,
+            u'简介': None,
             u'中文名': None,
             u'外文名': None,
             u'国籍': None,
@@ -91,12 +106,10 @@ class HTMLParser(object):
 
         #if actor in tag or movie in tag : 
         if actor in tag : 
-            res_data["url"] = page_url
-            title_node = soup.find("dd", class_ = "lemmaWgt-lemmaTitle-title").find("h1")
-            res_data["title"] = title_node.get_text()
             summary_node = soup.find("div", class_ = "lemma-summary")
-            res_data["summary"] = summary_node.get_text()
-    
+            basic[u'简介'] = summary_node.get_text().replace("\n"," ")
+            basic['id'] = count
+            
             basic_node = soup.find("div", class_ = "basic-info cmn-clearfix")
             all_basicInfo_item = soup.find_all("dt", class_ = "basicInfo-item name" )
             basic_item = self._get_from_findall(all_basicInfo_item)
@@ -107,14 +120,15 @@ class HTMLParser(object):
 
             for i, item in enumerate(basic_item):
                 if basic.has_key(item):
-                    basic[item] = basic_value[i]
-           
-            #res_data["basic"] = basic_node.get_text()
+                    basic[item] = basic_value[i].replace("\n","")
+            res_data = self.dict_to_list(basic) 
             count = count + 1
+            
+            print "检测到新目标，目前共采集总数： ", count -1 
 
-            return res_data, basic, count
+            return res_data, count
         else:
-            return None, None, count
+            return None, count
 
     def parse(self, page_url, HTML_cont, count):
         if page_url is None or HTML_cont is None:
@@ -122,7 +136,7 @@ class HTMLParser(object):
 
         soup = BeautifulSoup(HTML_cont, "html.parser", from_encoding="utf-8")
         new_urls = self._get_new_urls(page_url, soup)
-        new_data, _, count = self._get_new_data(page_url, soup, count)
+        new_data, count = self._get_new_data(soup, count)
         return new_urls, new_data, count
 
 class HTMLOutputer(object):
@@ -132,7 +146,10 @@ class HTMLOutputer(object):
     def collect_data(self, data):
         if data is None:
             return None
-        self.datas.append(data)
+
+        mysql_cursor.execute(insert_actor_command, data)
+
+        #self.datas.append(data)
 
     def output_HTML(self):
         fout = open("baike_spider_output.HTML", "w")
@@ -149,60 +166,44 @@ class HTMLOutputer(object):
             fout.write("<td>%s</td>" % data["url"])
             fout.write("<td><ahref='%s'>%s</a></td>" %(data["url"].encode("utf-8"),data["title"].encode("utf-8")))
             fout.write("<td>%s</td>" %data["summary"].encode("utf-8"))
-            fout.write("<td>%s</td>" %data["basic"].encode("utf-8"))
+            #fout.write("<td>%s</td>" %data["basic"].encode("utf-8"))
             fout.write("</tr>")
         fout.write("</table>")
         fout.write("</body>")
         fout.write("</HTML>")
 
-    def _get_actor_tag(self):
-        actor_list = ()
-
-        actor_bio = data["summary"].encode("utf-8")
-        actor_chName = data["title"].encode("utf-8")
-
-        where_foreName = data["basic"].find(u"外文名")
-        actor_foreName = data["basic"][where_foreName + 4: ]
-
-        where_nationality = data["basic"].find(u"国籍")
-        where_constellation = data["basic"].find(u"星座")
-        where_birthPlace = data["basic"].find(u"出生地")
-        where_birthDay = data["basic"].find(u"出生日期")
-        where_repWorks = data["basic"].find(u"代表作品")
-        where_achiem = data["basic"].find(u"主要成就")
-        where_brokerage = data["basic"].find(u"经纪公司")
-
-
-        actor_list = ()
-        return 0
-
-
 class SpiderMain():
     def craw(self, root_url, page_counts):
-        count = 0
+        count = 1
         UrlManager.add_new_url(root_url)
         while UrlManager.has_new_url(): # still has url
             new_url =UrlManager.get_new_url()
-            print "\ncrawed %d :%s" % (count, new_url)
+            #print "\ncrawed %d :%s" % (count, new_url)
             HTML_cont =HTMLDownloader.download(new_url)
             new_urls, new_data, count =HTMLParser.parse(new_url, HTML_cont, count)
             UrlManager.add_new_urls(new_urls)
             HTMLOutputer.collect_data(new_data)
-            if count == page_counts:
+            if count == page_counts+1:
                 break
-        HTMLOutputer.output_HTML()
+        #HTMLOutputer.output_HTML()
 
 if __name__=="__main__":
+    mysql_cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
     print "\nWelcome to use baike_spider:)"
     UrlManager = UrlManager()
     HTMLDownloader = HTMLDownloader()
     HTMLParser = HTMLParser()
     HTMLOutputer = HTMLOutputer()
 
-    #root_url = "https://baike.baidu.com/item/Python/407313?fr=aladdin"
-    root_url = "https://baike.baidu.com/item/%E5%91%A8%E6%98%9F%E9%A9%B0/169917?fr=aladdin"
-    page_counts = input("Enter you want tocraw how many pages:" )  #想要爬取的数量
+    root_url = "https://baike.baidu.com/item/%E5%BC%A0%E6%B6%B5%E4%BA%88"  #爬虫入口，默认是张涵予百科主页
+    page_counts = input("Enter you want tocraw how many pages:" )  #想要爬取的数量,没爬取到目标分类下的不计数
     SpiderMain = SpiderMain()
     SpiderMain.craw(root_url,page_counts)   #启动爬虫
+
+    #提交所有的insert 操作
+    mysql_cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+    mysql_db.commit()
+    mysql_cursor.close()
+    mysql_db.close()
 
     print"\nCraw is done, please go to"+os.path.dirname(os.path.abspath('__file__')) + " to see the resultin baike_spider_output.HTML"
