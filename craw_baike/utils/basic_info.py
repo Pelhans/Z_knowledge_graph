@@ -6,9 +6,15 @@
 '''
 
 insert_actor_command = 'INSERT INTO actor (actor_id, actor_bio, actor_chName, actor_foreName, actor_nationality, actor_constellation, actor_birthPlace, actor_birthDay, actor_repWorks, actor_achiem, actor_brokerage ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) '
-insert_movie_command = 'INSERT INTO movie (movie_id, movie_bio, movie_chName, movie_foreName, movie_prodTime, movie_prodCompany, movie_director,    movie_screenwriter, movie_genre, movie_star, movie_length, movie_rekeaseTime, movie_language, movie_achiem ) VALUES (%s, %s, %s, %s, %s, %s, %s,    %s, %s, %s, %s, %s, %s, %s ) '
-insert_actor_movie_command = 'INSERT INTO actor_to_movie (actor_id, movid_id ) VALUES (%s, %s) '
-insert_movie_genre_command = 'INSERT INTO movie_to_genre (movie_id, genre_id ) VALUES (%s, %s) ' # id 是整数，pymysql不支持%i %d这种，都用%s
+insert_movie_command = 'INSERT INTO movie (movie_id, movie_bio, movie_chName, movie_foreName, movie_prodTime, movie_prodCompany, movie_director,    movie_screenwriter, movie_genre, movie_star, movie_length, movie_rekeaseTime, movie_language, movie_achiem ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) '
+insert_actor_movie_command = 'INSERT INTO actor_to_movie (actor_movie_id, actor_id, movie_id ) VALUES (%s, %s, %s ) '
+insert_movie_genre_command = 'INSERT INTO movie_to_genre (movie_genre_id, movie_id, genre_id ) VALUES (%s, %s, %s ) ' # id 是整数，pymysql不支持%i %d这种，都用%s
+
+search_actor_id = 'SELECT actor_id FROM actor WHERE actor_chName= "%s" '
+search_movie_id = 'SELECT movie_id FROM movie WHERE movie_chName= "%s" '
+
+get_largest_amid = 'SELECT max(actor_movie_id) FROM actor_to_movie '
+get_largest_mgid = 'SELECT max(movie_genre_id) FROM movie_to_genre '
 
 actor_attr = {        
     u'id' : int, 
@@ -43,3 +49,7 @@ movie_attr = {
     u'主要成就': None
        }
 movie_info = [u'id', u'简介',  u'中文名', u'外文名', u'出品时间', u'出品公司', u'导演',  u'编剧', u'类型', u'主演', u'片长', u'上映时间', u'对白语言', u'主要成就' ]
+
+movie_genre = [u'爱情', u'喜剧', u'动作', u'剧情', u'科幻', u'恐怖', u'动画', u'惊悚', u'犯罪', u'冒险', u'其他' ]
+
+

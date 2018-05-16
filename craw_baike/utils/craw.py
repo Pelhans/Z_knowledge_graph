@@ -17,10 +17,12 @@ basic_list = []
 target = sys.argv[1]
 if target == 'actor':
     target = actor
+    insert_command = basic_info.insert_actor_command
     basic_attr = basic_info.actor_attr
     basic_list = basic_info.actor_info
 elif target == 'movie':
     target = movie
+    insert_command = basic_info.insert_movie_command
     basic_attr = basic_info.movie_attr
     basic_list = basic_info.movie_info
 
@@ -59,7 +61,7 @@ class HTMLDownloader(object):
     def download(self, url):
         if url is None:
             return None
-        response = urllib2.urlopen(url)
+        response = urllib2.urlopen(url.encode('utf-8'))
         if response.getcode() != 200:
             return None
 
@@ -116,12 +118,12 @@ class HTMLParser(object):
             for i, item in enumerate(basic_item):
                 if basic.has_key(item):
                     basic[item] = basic_value[i].replace("\n","")
-            res_data = self.dict_to_list(basic) 
+            #res_data = self.dict_to_list(basic)
             count = count + 1
             
-            print "检测到新目标，目前共采集总数： ", count -1 
+            print "检测到新目标，目前共采集总数： ", count - 1 
 
-            return res_data, count
+            return basic, count
         else:
             return None, count
 
@@ -135,21 +137,53 @@ class HTMLParser(object):
         return new_urls, new_data, count
 
 class HTMLOutputer(object):
-    def collect_data(self, data):
+    def collect_data(self, data, count_er_id):
         if data is None:
-            return None
-        mysql_cursor.execute(basic_info.insert_actor_command, data) # 将获得的数据插入到Mysql数据库中
+            return count_er_id
+        if sys.argv[1] == 'actor':
+            count_er_id = self.get_actor_movie(data, count_er_id)
+        data = HTMLParser.dict_to_list(data)
+        mysql_cursor.execute(insert_command, data) # 将获得的数据插入到Mysql数据库中
+
+        return count_er_id
+
+    def get_actor_movie(self, data, count_actor_movie):
+
+        if data is None:
+            return count_er_id
+        pres = data[u'代表作品'].strip()
+        pres = re.split(u'[，、]', pres)
+        actor_id = data['id']
+        movie_id = 0
+        
+        print "sadsadasdas", pres
+
+        for pre in pres:
+            print "pre: ", pre
+            movie_id = mysql_cursor.execute(basic_info.search_movie_id % (pre))
+            if movie_id != 0:
+                print "count_actor_movie: ", count_actor_movie
+                count_actor_movie = count_actor_movie + 1
+                mysql_cursor.execute(basic_info.insert_actor_movie_command, (count_actor_movie, actor_id, movie_id ))
+
+        return count_actor_movie
 
 class SpiderMain():
     def craw(self, root_url, page_counts):
         count = 1
+        count_er_id = 0
+        if sys.argv[1] == 'actor':
+            count_er_id = mysql_cursor.execute( basic_info.get_largest_amid)
+            print count_er_id
+        elif sys.argv[1] == 'movie':
+            count_er_id = mysql_cursor.execute( basic_info.get_largest_mgid)
         UrlManager.add_new_url(root_url)
         while UrlManager.has_new_url(): # still has url
             new_url =UrlManager.get_new_url()
             HTML_cont =HTMLDownloader.download(new_url)
             new_urls, new_data, count =HTMLParser.parse(new_url, HTML_cont, count)
             UrlManager.add_new_urls(new_urls)
-            HTMLOutputer.collect_data(new_data)
+            count_er_id = HTMLOutputer.collect_data(new_data, count_er_id)
             if count == page_counts+1:
                 break
 

@@ -22,6 +22,6 @@ CREATE TABLE actor( actor_id INT NOT NULL,  actor_bio TEXT, actor_chName VARCHAR
 
 CREATE TABLE movie( movie_id INT NOT NULL, movie_bio TEXT, movie_chName VARCHAR(100), movie_foreName VARCHAR(100), movie_prodTime VARCHAR(100),  movie_prodCompany VARCHAR(100), movie_director VARCHAR(100), movie_screenwriter VARCHAR(100), movie_genre VARCHAR(100), movie_star VARCHAR(100), movie_length VARCHAR(100), movie_rekeaseTime VARCHAR(100), movie_language VARCHAR(100), movie_achiem VARCHAR(100), PRIMARY KEY(movie_id) );
 
-CREATE TABLE actor_to_movie( actor_id INT NOT NULL, movie_id INT, PRIMARY KEY(actor_id) );
+CREATE TABLE actor_to_movie( actor_movie_id INT NOT NULL, actor_id INT NOT NULL, movie_id INT NOT NULL, PRIMARY KEY(actor_movie_id) );
 
-CREATE TABLE movie_to_genre( movie_id INT NOT NULL, genre_id INT NOT NULL, PRIMARY KEY(movie_id) );
+CREATE TABLE movie_to_genre( movie_genre_id INT NOT NULL, movie_id INT NOT NULL, genre_id INT NOT NULL, PRIMARY KEY(movie_genre_id) );
