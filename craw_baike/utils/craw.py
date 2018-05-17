@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding=utf-8
 
+import chardet # for test
+
 from bs4 import BeautifulSoup
 import re
 import urlparse
@@ -9,7 +11,7 @@ import sys, os
 import pymysql
 import basic_info
 
-actor = u'\n\u6f14\u5458\n' #line 91 演员的unicode 码,下面是电影的
+actor = u'\n\u6f14\u5458\n' # 演员的unicode 码,下面是电影的
 movie = u'\n\u7535\u5f71\n'
 
 basic_attr = {}
@@ -101,7 +103,6 @@ class HTMLParser(object):
         open_tag = soup.find_all("span", class_ = "taglist")
         tag = self._get_from_findall(open_tag)
 
-        #if actor in tag or movie in tag : 
         if target in tag : 
             summary_node = soup.find("div", class_ = "lemma-summary")
             basic[u'简介'] = summary_node.get_text().replace("\n"," ")
@@ -116,9 +117,8 @@ class HTMLParser(object):
             basic_value = [s.strip() for s in basic_value]
 
             for i, item in enumerate(basic_item):
-                if basic.has_key(item):
-                    basic[item] = basic_value[i].replace("\n","")
-            #res_data = self.dict_to_list(basic)
+                if basic.has_key(item.replace(u" ", "")):
+                    basic[item.replace(u" ", "")] = basic_value[i].replace("\n","")
             count = count + 1
             
             print "检测到新目标，目前共采集总数： ", count - 1 
@@ -142,6 +142,8 @@ class HTMLOutputer(object):
             return count_er_id
         if sys.argv[1] == 'actor':
             count_er_id = self.get_actor_movie(data, count_er_id)
+        elif sys.argv[1] == 'movie':
+            count_er_id = self.get_movie_genre(data, count_er_id)
         data = HTMLParser.dict_to_list(data)
         mysql_cursor.execute(insert_command, data) # 将获得的数据插入到Mysql数据库中
 
@@ -154,19 +156,32 @@ class HTMLOutputer(object):
         pres = data[u'代表作品'].strip()
         pres = re.split(u'[，、]', pres)
         actor_id = data['id']
-        movie_id = 0
         
-        print "sadsadasdas", pres
-
         for pre in pres:
-            print "pre: ", pre
-            movie_id = mysql_cursor.execute(basic_info.search_movie_id % (pre))
-            if movie_id != 0:
-                print "count_actor_movie: ", count_actor_movie
+            mysql_cursor.execute(basic_info.search_movie_id % pre )
+            movie_id = mysql_cursor.fetchall()
+            if movie_id:
+                movie_id = movie_id[0][0]
                 count_actor_movie = count_actor_movie + 1
                 mysql_cursor.execute(basic_info.insert_actor_movie_command, (count_actor_movie, actor_id, movie_id ))
 
         return count_actor_movie
+
+    def get_movie_genre(self, data, count_movie_genre):
+        if data[u'类型'] is None:
+            return count_movie_genre
+
+        pres = data[u'类型'].strip()
+        pres = re.split(u'[，、；]', pres)
+        movie_id = data['id']
+
+        for pre in pres:
+            genre_id = basic_info.movie_genre[pre]
+            count_movie_genre = count_movie_genre + 1
+            mysql_cursor.execute(basic_info.insert_movie_genre_command, (count_movie_genre, movie_id, genre_id ))
+
+        return count_movie_genre
+            
 
 class SpiderMain():
     def craw(self, root_url, page_counts):
@@ -174,7 +189,6 @@ class SpiderMain():
         count_er_id = 0
         if sys.argv[1] == 'actor':
             count_er_id = mysql_cursor.execute( basic_info.get_largest_amid)
-            print count_er_id
         elif sys.argv[1] == 'movie':
             count_er_id = mysql_cursor.execute( basic_info.get_largest_mgid)
         UrlManager.add_new_url(root_url)
@@ -189,15 +203,17 @@ class SpiderMain():
 
 if __name__=="__main__":
     mysql_cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
-    print "\nWelcome to use baike_spider:)"
+    print "\n欢迎使用百度百科爬虫,初始化中.... "
     UrlManager = UrlManager()
     HTMLDownloader = HTMLDownloader()
     HTMLParser = HTMLParser()
     HTMLOutputer = HTMLOutputer()
 
     root_url = "https://baike.baidu.com/item/%E5%BC%A0%E6%B6%B5%E4%BA%88"  #爬虫入口，默认是张涵予百科主页
-    page_counts = input("Enter you want tocraw how many pages:" )  #想要爬取的数量,没爬取到目标分类下的不计数
+    page_counts = input("输入想要爬取的目标数量:" )  #想要爬取的数量,没爬取到目标分类下的不计数
     SpiderMain = SpiderMain()
+
+    print "\n开始爬取...."
     SpiderMain.craw(root_url,page_counts)   #启动爬虫
 
     #提交所有的insert 操作

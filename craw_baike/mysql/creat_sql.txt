@@ -24,4 +24,7 @@ CREATE TABLE movie( movie_id INT NOT NULL, movie_bio TEXT, movie_chName VARCHAR(
 
 CREATE TABLE actor_to_movie( actor_movie_id INT NOT NULL, actor_id INT NOT NULL, movie_id INT NOT NULL, PRIMARY KEY(actor_movie_id) );
 
+CREATE TABLE genre ( genre_id INT NOT NULL, genre_name VARCHAR(100), PRIMARY KEY(genre_id)  );
+INSERT INTO genre (genre_id, genre_name) VALUES (0, '爱情'), (1, '喜剧'), (2, '动作'), (3, '剧情'), (4, '科幻'), (5, '恐怖'), (6, '动画'), (7, '惊悚'), (8, '犯罪'), (9, '冒险'), (10, '其他');
+
 CREATE TABLE movie_to_genre( movie_genre_id INT NOT NULL, movie_id INT NOT NULL, genre_id INT NOT NULL, PRIMARY KEY(movie_genre_id) );
