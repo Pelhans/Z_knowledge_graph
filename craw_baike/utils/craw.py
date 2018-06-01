@@ -10,9 +10,14 @@ import urllib2
 import sys, os
 import pymysql
 import basic_info
+import httplib
+
+httplib.HTTPConnection._http_vsn = 10  
+httplib.HTTPConnection._http_vsn_str = 'HTTP/1.0' # 强制指定HTTP/1.0
 
 actor = u'\n\u6f14\u5458\n' # 演员的unicode 码,下面是电影的
 movie = u'\n\u7535\u5f71\n'
+global current_url
 
 basic_attr = {}
 basic_list = []
@@ -34,8 +39,15 @@ mysql_cursor = mysql_db.cursor()
 # manage the url
 class UrlManager(object):
     def __init__(self):
-        self.new_urls = set()
-        self.old_urls = set()
+        self.new_urls = self.get_old_urls("new_url.txt")
+        self.old_urls = self.get_old_urls("old_url.txt")
+
+    def get_old_urls(self, file):   # 从文件初始化已获取的网址列表
+        with open(file, 'rw') as fo:
+            ourls = fo.readlines()
+            ourls = set(ourls)
+            fo.close()
+        return ourls
 
     def add_new_url(self, url):
         if url is None:
@@ -66,8 +78,10 @@ class HTMLDownloader(object):
         response = urllib2.urlopen(url.encode('utf-8'))
         if response.getcode() != 200:
             return None
-
-        return response.read()
+        try:
+            return response.read()
+        except:
+            return None
 
 # HTML parser
 class HTMLParser(object):
@@ -129,9 +143,10 @@ class HTMLParser(object):
 
     def parse(self, page_url, HTML_cont, count):
         if page_url is None or HTML_cont is None:
-            return None
+            return None, None, count
 
         soup = BeautifulSoup(HTML_cont, "html.parser", from_encoding="utf-8")
+        print "目前正在处理的网页链接为: ", page_url
         new_urls = self._get_new_urls(page_url, soup)
         new_data, count = self._get_new_data(soup, count)
         return new_urls, new_data, count
@@ -145,7 +160,12 @@ class HTMLOutputer(object):
         elif sys.argv[1] == 'movie':
             count_er_id = self.get_movie_genre(data, count_er_id)
         data = HTMLParser.dict_to_list(data)
-        mysql_cursor.execute(insert_command, data) # 将获得的数据插入到Mysql数据库中
+        try:
+            mysql_cursor.execute(insert_command, data) # 将获得的数据插入到Mysql数据库中
+            if count_er_id % 10 == 0:
+                mysql_db.commit()
+        except:
+            print "Collect_data Warning: skiping this event due to some error: ", count_er_id
 
         return count_er_id
 
@@ -163,7 +183,10 @@ class HTMLOutputer(object):
             if movie_id:
                 movie_id = movie_id[0][0]
                 count_actor_movie = count_actor_movie + 1
-                mysql_cursor.execute(basic_info.insert_actor_movie_command, (count_actor_movie, actor_id, movie_id ))
+                try:
+                    mysql_cursor.execute(basic_info.insert_actor_movie_command, (count_actor_movie, actor_id, movie_id ))
+                except:
+                    print "Actor_Movie Warning: skip this duplicate event ", count_actor_movie, actor_id, movie_id
 
         return count_actor_movie
 
@@ -176,9 +199,15 @@ class HTMLOutputer(object):
         movie_id = data['id']
 
         for pre in pres:
-            genre_id = basic_info.movie_genre[pre]
+            if pre in basic_info.movie_genre.keys():
+                genre_id = basic_info.movie_genre[pre]
+            else:
+                genre_id = basic_info.movie_genre[u'其他']
             count_movie_genre = count_movie_genre + 1
-            mysql_cursor.execute(basic_info.insert_movie_genre_command, (count_movie_genre, movie_id, genre_id ))
+            try:
+                mysql_cursor.execute(basic_info.insert_movie_genre_command, (count_movie_genre, movie_id, genre_id ))
+            except:
+                print "Movie_Genre Warning: skip this duplicate event ", count_movie_genre, movie_id, genre_id 
 
         return count_movie_genre
             
@@ -195,11 +224,19 @@ class SpiderMain():
         while UrlManager.has_new_url(): # still has url
             new_url =UrlManager.get_new_url()
             HTML_cont =HTMLDownloader.download(new_url)
-            new_urls, new_data, count =HTMLParser.parse(new_url, HTML_cont, count)
+            new_urls, new_data, count = HTMLParser.parse(new_url, HTML_cont, count)
             UrlManager.add_new_urls(new_urls)
             count_er_id = HTMLOutputer.collect_data(new_data, count_er_id)
+            if count_er_id % 10 == 0:
+                self.save_file("old_url.txt", UrlManager.old_urls)
+                self.save_file("new_url.txt", UrlManager.new_urls)
             if count == page_counts+1:
                 break
+    
+    def save_file(self, file, data):
+        with open(file, "w") as wfile:
+            wfile.write(str(data))
+            wfile.close()
 
 if __name__=="__main__":
     mysql_cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
