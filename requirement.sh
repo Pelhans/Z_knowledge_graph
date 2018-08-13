@@ -1,3 +1,5 @@
 #!/bin/bash
 
-sudo pip install BeautifulSoup4
+BeautifulSoup4
+chardet
+pymysql

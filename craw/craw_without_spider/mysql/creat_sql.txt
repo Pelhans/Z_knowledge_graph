@@ -18,13 +18,18 @@
 CREATE DATABASE kg_movie;
 USE kg_movie;
 
-CREATE TABLE actor( actor_id INT NOT NULL,  actor_bio TEXT, actor_chName VARCHAR(100), actor_foreName VARCHAR(100), actor_nationality VARCHAR(100), actor_constellation VARCHAR(100), actor_birthPlace VARCHAR(100), actor_birthDay VARCHAR(100), actor_repWorks VARCHAR(100), actor_achiem VARCHAR(100), actor_brokerage VARCHAR(100), PRIMARY KEY(actor_id) );
+CREATE TABLE actor( actor_id INT NOT NULL,  actor_bio TEXT, actor_chName VARCHAR(100), actor_foreName VARCHAR(100), actor_nationality VARCHAR(100), actor_constellation VARCHAR(100), actor_birthPlace VARCHAR(100), actor_birthDay VARCHAR(100), actor_repWorks VARCHAR(100), actor_achiem TEXT, actor_brokerage VARCHAR(100), PRIMARY KEY(actor_id) );
 
 CREATE TABLE movie( movie_id INT NOT NULL, movie_bio TEXT, movie_chName VARCHAR(100), movie_foreName VARCHAR(100), movie_prodTime VARCHAR(100),  movie_prodCompany VARCHAR(100), movie_director VARCHAR(100), movie_screenwriter VARCHAR(100), movie_genre VARCHAR(100), movie_star VARCHAR(100), movie_length VARCHAR(100), movie_rekeaseTime VARCHAR(100), movie_language VARCHAR(100), movie_achiem VARCHAR(100), PRIMARY KEY(movie_id) );
 
 CREATE TABLE actor_to_movie( actor_movie_id INT NOT NULL, actor_id INT NOT NULL, movie_id INT NOT NULL, PRIMARY KEY(actor_movie_id) );
 
 CREATE TABLE genre ( genre_id INT NOT NULL, genre_name VARCHAR(100), PRIMARY KEY(genre_id)  );
+# Set char Set
+ALTER TABLE actor CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE movie CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE genre CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 INSERT INTO genre (genre_id, genre_name) VALUES (0, '爱情'), (1, '喜剧'), (2, '动作'), (3, '剧情'), (4, '科幻'), (5, '恐怖'), (6, '动画'), (7, '惊悚'), (8, '犯罪'), (9, '冒险'), (10, '其他');
 
 CREATE TABLE movie_to_genre( movie_genre_id INT NOT NULL, movie_id INT NOT NULL, genre_id INT NOT NULL, PRIMARY KEY(movie_genre_id) );
