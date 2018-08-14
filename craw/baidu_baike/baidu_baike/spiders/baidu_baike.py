@@ -10,12 +10,15 @@ from baidu_baike.items import BaiduBaikeItem
 import scrapy
 from scrapy.http import Request
 from bs4 import BeautifulSoup
+import re
+import urlparse
 
 class BaiduBaikeSpider(scrapy.Spider, object):
     name = 'baidu'
+    allowed_domains = ["baike.baidu.com"]
     start_urls = ['https://baike.baidu.com/item/%E5%91%A8%E6%98%9F%E9%A9%B0/169917?fr=aladdin']
 #    start_urls = ['https://baike.baidu.com/item/%E4%B8%83%E5%B0%8F%E7%A6%8F']
-
+    
     def _get_from_findall(self, tag_list):
         result = []        
                            
@@ -32,9 +35,9 @@ class BaiduBaikeSpider(scrapy.Spider, object):
         # tooooo ugly,,,, but can not use defaultdict
         for sub_item in [ 'actor_bio', 'actor_chName', 'actor_foreName', 'actor_nationality', 'actor_constellation', 'actor_birthPlace', 'actor_birthDay', 'actor_repWorks', 'actor_achiem', 'actor_brokerage','movie_bio', 'movie_chName', 'movie_foreName', 'movie_prodTime', 'movie_prodCompany', 'movie_director', 'movie_screenwriter', 'movie_genre', 'movie_star', 'movie_length', 'movie_rekeaseTime', 'movie_language', 'movie_achiem' ]:
             item[sub_item] = None
+
         if u'演员' in page_category:
             print("Get a actor page")
-            item['actor_chName'] = response.xpath("//dd[@class='lemmaWgt-lemmaTitle-title']/h1/text()").extract()[0].strip()
             soup = BeautifulSoup(response.text, 'lxml')
             summary_node = soup.find("div", class_ = "lemma-summary")
             item['actor_bio'] = summary_node.get_text().replace("\n"," ")
@@ -65,6 +68,7 @@ class BaiduBaikeSpider(scrapy.Spider, object):
                     item['actor_achiem'] = basic_value[i]
                 elif info == u'经纪公司':
                     item['actor_brokerage'] = basic_value[i]
+            yield item
         elif u'电影' in page_category:
             print("Get a movie page!!")
 
@@ -103,5 +107,11 @@ class BaiduBaikeSpider(scrapy.Spider, object):
                     item['movie_language'] = basic_value[i]
                 elif info == u'主要成就':
                     item['movie_achiem'] = basic_value[i]
-
             yield item
+
+        soup = BeautifulSoup(response.text, 'lxml')
+        links = soup.find_all('a', href=re.compile(r"/item/"))
+        for link in links:
+            new_url = link["href"]
+            new_full_url = urlparse.urljoin('https://baike.baidu.com/', new_url)
+            yield scrapy.Request(new_full_url, callback=self.parse)

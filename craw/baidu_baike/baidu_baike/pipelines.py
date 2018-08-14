@@ -51,10 +51,11 @@ class BaiduBaikePipeline(object):
             if (actor_chName,) not in actorList :
                 # get the nums of actor_id in table actor
                 self.cursor.execute("SELECT MAX(actor_id) FROM actor")
-                if None in self.cursor.fetchall()[0]:
+                result = self.cursor.fetchall()[0]
+                if None in result:
                     actor_id = 1
                 else:
-                    actor_id = self.cursor.fetchall()[0] + 1
+                    actor_id = result[0] + 1
                 sql = """
                 INSERT INTO actor(actor_id, actor_bio, actor_chName, actor_foreName, actor_nationality, actor_constellation, actor_birthPlace, actor_birthDay, actor_repWorks, actor_achiem, actor_brokerage ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
