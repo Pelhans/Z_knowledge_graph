@@ -4,6 +4,10 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
+from __future__ import absolute_import
+from __future__ import division     
+from __future__ import print_function
+
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -44,19 +48,20 @@ class BaiduBaikePipeline(object):
 
             self.cursor.execute("SELECT actor_chName FROM actor;")
             actorList = self.cursor.fetchall()
-            actorstr = ''.join(map(str, actorList))
-            if actorstr.find(actor_chName) == -1:
+            if (actor_chName,) not in actorList :
                 # get the nums of actor_id in table actor
                 self.cursor.execute("SELECT MAX(actor_id) FROM actor")
                 if None in self.cursor.fetchall()[0]:
                     actor_id = 1
                 else:
-                    actor_id = self.cursor.fetchall()[0][0] + 1
+                    actor_id = self.cursor.fetchall()[0] + 1
                 sql = """
                 INSERT INTO actor(actor_id, actor_bio, actor_chName, actor_foreName, actor_nationality, actor_constellation, actor_birthPlace, actor_birthDay, actor_repWorks, actor_achiem, actor_brokerage ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 self.cursor.execute(sql, (actor_id, actor_bio, actor_chName, actor_foreName, actor_nationality, actor_constellation, actor_birthPlace, actor_birthDay, actor_repWorks, actor_achiem, actor_brokerage ))
                 self.conn.commit()
+            else:
+                print("#" * 20, "Got a duplict actor!!", actor_chName)
         elif (item['movie_chName'] != None or item['movie_foreName'] != None) and item['actor_chName'] == None:
             movie_bio = str(item['movie_bio']).decode('utf-8')
             movie_prodTime = str(item['movie_prodTime']).decode('utf-8')
@@ -72,15 +77,20 @@ class BaiduBaikePipeline(object):
 
             self.cursor.execute("SELECT movie_chName FROM movie;")
             movieList = self.cursor.fetchall()
-            moviestr = ''.join(map(str, movieList))
-            if moviestr.find(movie_chName) == -1:
+            if (movie_chName,) not in movieList :
                 self.cursor.execute("SELECT MAX(movie_id) FROM movie")
-                movie_id = self.cursor.fetchall()[0] + 1
+                result = self.cursor.fetchall()[0]
+                if None in result:
+                    movie_id = 1
+                else:
+                    movie_id = result[0] + 1
                 sql = """
                 INSERT INTO movie(  movie_id, movie_bio, movie_chName, movie_foreName, movie_prodTime, movie_prodCompany, movie_director, movie_screenwriter, movie_genre, movie_star, movie_length, movie_rekeaseTime, movie_language, movie_achiem ) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 self.cursor.execute(sql, ( movie_id, movie_bio, movie_chName, movie_foreName, movie_prodTime, movie_prodCompany, movie_director, movie_screenwriter, movie_genre, movie_star, movie_length, movie_rekeaseTime, movie_language, movie_achiem ))
                 self.conn.commit()
+            else:
+                print("Got a duplict movie!!", movie_chName)
         else:
             print("Skip this page because wrong category!! ")
         return item
