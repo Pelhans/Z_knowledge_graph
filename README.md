@@ -11,17 +11,14 @@
     * 微信公众号爬虫, 使用scrapy 框架对微信公众号文章进行爬取,用于获取非结构化文本    
     * 虎嗅网爬虫,基于scrapy, 爬取虎嗅网新闻类非结构化文本   
     * 百度百科爬虫，基于scrapy框架，爬取电影类数据，包含电影22219部，演员13967人    
-    * 互动百科爬虫，ongoing....
+    * 互动百科爬虫，使用scrapy， 爬取电影类数据，
+    * 豆瓣爬虫
 
 # 爬虫
 
 ## 百度百科爬虫
 
 该爬虫对应与crawl 下的baidu_baike 文件夹。该爬虫基于scrapy框架，爬取电影类数据，包含电影22219部，演员13967人，对应数据集可在[坚果云下载](https://www.jianguoyun.com/p/Dfga9AgQq_6CBxiw8Go)
-
-## craw_without_spider
-
-百科数据爬取爬虫，用于提取半结构化实体文本。该爬虫未使用scrapy框架.用于提取目标是百度百科里面的演员和电影。
 
 ### mysql建库
 * 演员 ：爬取内容为 ID, 简介， 中文名，外文名，国籍，星座，出生地，出生日期，代表作品，主要成就，经纪公司；  
@@ -30,7 +27,20 @@
 * 演员->电影： 演员ID， 电影ID； 
 * 电影-> 类型： 电影ID， 类型ID；
 
-与其相对应的建表语句即要求请参考mysql/creat_sql.txt文件。  、
+与其相对应的建表语句即要求请参考craw_without_spider/mysql/creat_sql.txt文件。 在修改目标库的名称后即可通过
+```
+mysql -uroot -pnlp < creat_sql.txt
+```
+创建数据库。
+
+### 运行爬虫
+直接运行 scrapy crawl baidu 即可
+
+## craw_without_spider
+
+百科数据爬取爬虫，用于提取半结构化实体文本。该爬虫未使用scrapy框架.用于提取目标是百度百科里面的演员和电影。
+
+
 ### 运行爬虫程序
 爬虫程序可爬取演员和电影两类，其中：  
 * 爬取演员：python craw.py actor 
