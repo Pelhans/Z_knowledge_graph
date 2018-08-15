@@ -16,7 +16,7 @@ import urlparse
 class HudongBaikeSpider(scrapy.Spider, object):
     name = 'hudong'
     allowed_domains = ["www.baike.com"]
-#    start_urls = ['http://www.baike.com/wiki/%E5%94%90%E4%BC%AF%E8%99%8E%E7%82%B9%E7%A7%8B%E9%A6%99']
+#    start_urls = ['http://www.baike.com/wiki/%E5%94%90%E4%BC%AF%E8%99%8E%E7%82%B9%E7%A7%8B%E9%A6%99'] # tangbohu
     start_urls = ['http://www.baike.com/wiki/%E5%91%A8%E6%98%9F%E9%A9%B0&prd=button_doc_entry'] # zhouxingchi
     
     def _get_from_findall(self, tag_list):
@@ -41,19 +41,35 @@ class HudongBaikeSpider(scrapy.Spider, object):
             soup = BeautifulSoup(response.text, 'lxml')
             summary_node = soup.find("div", class_ = "summary")
             item['actor_bio'] = summary_node.get_text().replace("\n"," ")
+            basic_item = []
+            basic_value = []
 
-            item_box = response.xpath('//div[@class="module zoom"]//strong/text()').extract()
-            value_str = response.xpath('//div[@class="module zoom"]//span')
-            value_box = value_str.xpath('string(.)').extract()
-                                          
-            basic_item = [ re.sub(u"[\n ：]", r"", str) for str in item_box ]
-            basic_value = [re.sub(u"[\n ：]", r"", str) for str in value_box ]
-            print("item_box, ",  len(basic_item), basic_item)
-            print("item_value: ", len(basic_value), basic_value)
+            all_tds = response.xpath('//div[@class="module zoom"]//td').extract()
+            for each_td in all_tds:
+                strong_span = each_td.split("</td>")[0].split("</strong>")
+                for sub_strong_span in strong_span:
+                    if sub_strong_span.find("<strong>") != -1:
+                        get_strong = sub_strong_span.split("<strong>")[-1]
+                        basic_item.append(get_strong)
+                    elif sub_strong_span.find("<span>") != -1:
+                        get_span = sub_strong_span.split("</span>")
+                        total_span = ''
+                        for each_span in get_span:
+                            each_span = each_span.strip("\n *<span>")
+                            if each_span != '':
+                                # remove all html tags in item & value
+                                if each_span.find("href") != -1:
+                                    each_span = re.sub(r'<a href=.*_blank">', "", each_span)
+                                    each_span = re.sub(r'href.*blank"', "", each_span)
+                                    each_span = re.sub(r'<img.*png">', "", each_span)
+                                    each_span = re.sub(r'</a>', "", each_span)
+                                    each_span = re.sub(r'[</>]', "", each_span)
+                                total_span = total_span + " " + each_span
+                        basic_value.append(total_span)
 
             for i, info in enumerate(basic_item):
                 info = info.replace(u"\xa0", "")
-                print("info: ", info)
+                info = info.replace(u"\uff1a", "")
                 if info == u'中文名':
                     item['actor_chName'] = basic_value[i]
                 elif info == u'英文名':
@@ -79,18 +95,35 @@ class HudongBaikeSpider(scrapy.Spider, object):
             soup = BeautifulSoup(response.text, 'lxml')
             summary_node = soup.find("div", class_ = "summary")
             item['movie_bio'] = summary_node.get_text().replace("\n"," ")
+            basic_item = []
+            basic_value = []
+
+            all_tds = response.xpath('//div[@class="module zoom"]//td').extract()
+            for each_td in all_tds:
+                strong_span = each_td.split("</td>")[0].split("</strong>")
+                for sub_strong_span in strong_span:
+                    if sub_strong_span.find("<strong>") != -1:
+                        get_strong = sub_strong_span.split("<strong>")[-1]
+                        basic_item.append(get_strong)
+                    elif sub_strong_span.find("<span>") != -1:
+                        get_span = sub_strong_span.split("</span>")
+                        total_span = ''
+                        for each_span in get_span:
+                            each_span = each_span.strip("\n *<span>")
+                            if each_span != '':
+                                # remove all html tags in item & value
+                                if each_span.find("href") != -1:
+                                    each_span = re.sub(r'<a href=.*_blank">', "", each_span)
+                                    each_span = re.sub(r'href.*blank"', "", each_span)
+                                    each_span = re.sub(r'<img.*png">', "", each_span)
+                                    each_span = re.sub(r'</a>', "", each_span)
+                                    each_span = re.sub(r'[</>]', "", each_span)
+                                total_span = total_span + " " + each_span
+                        basic_value.append(total_span)
                               
-            item_box = response.xpath('//div[@class="module zoom"]//strong/text()').extract()
-            value_str = response.xpath('//div[@class="module zoom"]//span')
-            value_box = value_str.xpath('string(.)').extract()
-
-            basic_item = [ re.sub(r"[\n ]", r"", str) for str in item_box ]
-            basic_value = [re.sub(r"[\n ]", r"", str) for str in value_box ]
-            print("item_box, ",  len(basic_item), basic_item)
-            print("item_value: ", len(basic_value), basic_value)
-
             for i, info in enumerate(basic_item):
                 info = info.replace(u"\xa0", "")
+                info = info.replace(u"\uff1a", "")
                 if info == u'中文名':
                     item['movie_chName'] = basic_value[i]
                 elif info in [u'外文名', u'别名'] :
@@ -110,7 +143,7 @@ class HudongBaikeSpider(scrapy.Spider, object):
                 elif info == u'片长':
                     item['movie_length'] = basic_value[i]
                 elif info == u'上映时间':
-                    item['movie_rekeaseTime'] = basic_value[i]
+                    item['movie_rekeaseTime'] = basic_value[i].replace('title="" href=""', "")
                 elif info == u'对白语言':
                     item['movie_language'] = basic_value[i]
                 elif info == u'主要成就':
@@ -118,6 +151,7 @@ class HudongBaikeSpider(scrapy.Spider, object):
             yield item
 
         new_urls = response.xpath("//a/@href").extract()
-        print("new_urls: ", new_urls)
         for link in new_urls:
-            yield scrapy.Request(link, callback=self.parse)
+            if link.startswith('http://www.baike.com/wiki'):
+                pass
+                yield scrapy.Request(link, callback=self.parse)
