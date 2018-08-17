@@ -15,6 +15,9 @@
     * 豆瓣爬虫(后续计划)    
 
 * 结构化数据到 RDF (Ongoing)
+    * Direct Mapping    
+    * D2RQ
+* TODO
 
 # 爬虫
 
@@ -72,7 +75,14 @@ mysql -uroot -pnlp < creat_sql.txt
 
 直接运行 scrapy crawl huxiu 即可。
 
+# 结构化数据到 RDF
 
+结构化数据到RDF由两种主要方式，一个是通过[direct mapping](https://www.w3.org/TR/rdb-direct-mapping/)，另一个通过[R2RML](https://www.w3.org/TR/r2rml/#acknowledgements)语言这种，基于R2RML语言的方式更为灵活，定制性强。对于R2RML有一些好用的工具，此处我们使用d2rq工具，它基于R2RML-KIT。
+
+## direct mapping
+TODO
+## D2RQ
+TODO
 
 # TODO:
 * 增加基于sceapy框架的百度百科、互动百科、豆瓣三个网站的爬虫，获取半结构化信息    
