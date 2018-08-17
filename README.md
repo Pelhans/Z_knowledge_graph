@@ -7,12 +7,14 @@
 # 目录
 
 * 爬虫
+    * 百度百科爬虫，基于scrapy框架，爬取电影类数据，包含电影22219部，演员13967人    
+    * 互动百科爬虫，使用scrapy， 爬取电影类数据，包含电影13866部，演员5931 人
     * craw_without_spider 未使用scrapy 的百度百科爬虫,用于获取半结构化文本    
     * 微信公众号爬虫, 使用scrapy 框架对微信公众号文章进行爬取,用于获取非结构化文本    
     * 虎嗅网爬虫,基于scrapy, 爬取虎嗅网新闻类非结构化文本   
-    * 百度百科爬虫，基于scrapy框架，爬取电影类数据，包含电影22219部，演员13967人    
-    * 互动百科爬虫，使用scrapy， 爬取电影类数据，
-    * 豆瓣爬虫
+    * 豆瓣爬虫(后续计划)    
+
+* 结构化数据到 RDF (Ongoing)
 
 # 爬虫
 
@@ -35,6 +37,14 @@ mysql -uroot -pnlp < creat_sql.txt
 
 ### 运行爬虫
 直接运行 scrapy crawl baidu 即可
+
+## 互动百科爬虫 
+
+该爬虫对应与crawl 下的hudong_baike 文件夹。该爬虫基于scrapy框架，爬取电影类数据，包含电影13866部，演员5931人，对应数据集可在[坚果云下载](https://www.jianguoyun.com/p/Db3wsKQQq_6CBxi7tGs)
+
+数据库的结构和百度百科的一致，也可通过creat_sql.txt 文件创建。    
+
+通过 scrapy crawl hudong 运行爬虫。
 
 ## craw_without_spider
 
