@@ -7,14 +7,14 @@
 # 目录
 
 * 爬虫
-    * 百度百科爬虫，基于scrapy框架，爬取电影类数据，包含电影22219部，演员13967人,演员电影间联系1942个，电影与类别间联系23238,其中类别为‘其他’的电影有10个。    
-    * 互动百科爬虫，使用scrapy， 爬取电影类数据，包含电影13866部，演员5931 人，演员电影间联系800个，电影与类别间联系14558,其中类别为‘其他’的电影有0个。    
+    * 百度百科爬虫，基于scrapy框架，爬取电影类数据，包含电影22219部，演员13967人    
+    * 互动百科爬虫，使用scrapy， 爬取电影类数据，包含电影13866部，演员5931 人    
     * craw_without_spider 未使用scrapy 的百度百科爬虫,用于获取半结构化文本    
     * 微信公众号爬虫, 使用scrapy 框架对微信公众号文章进行爬取,用于获取非结构化文本    
     * 虎嗅网爬虫,基于scrapy, 爬取虎嗅网新闻类非结构化文本   
     * 豆瓣爬虫(后续计划)    
 
-* 结构化数据到 RDF (Ongoing)
+* 结构化数据到 RDF 
     * Direct Mapping    
     * D2RQ
 * TODO
@@ -23,7 +23,7 @@
 
 ## 百度百科爬虫
 
-该爬虫对应与crawl 下的baidu_baike 文件夹。该爬虫基于scrapy框架，爬取电影类数据，包含电影22219部，演员13967人，对应数据集可在[坚果云下载](https://www.jianguoyun.com/p/Dfga9AgQq_6CBxiw8Go)
+该爬虫对应与crawl 下的baidu_baike 文件夹。该爬虫基于scrapy框架，爬取电影类数据，包含电影22219部，演员13967人，演员电影间联系1942个，电影与类别间联系23238,其中类别为‘其他’的电影有10个。对应数据集可在[坚果云下载](https://www.jianguoyun.com/p/Dfga9AgQq_6CBxiw8Go)
 
 ### mysql建库
 * 演员 ：爬取内容为 ID, 简介， 中文名，外文名，国籍，星座，出生地，出生日期，代表作品，主要成就，经纪公司；  
@@ -43,7 +43,7 @@ mysql -uroot -pnlp < creat_sql.txt
 
 ## 互动百科爬虫 
 
-该爬虫对应与crawl 下的hudong_baike 文件夹。该爬虫基于scrapy框架，爬取电影类数据，包含电影13866部，演员5931人，对应数据集可在[坚果云下载](https://www.jianguoyun.com/p/Db3wsKQQq_6CBxi7tGs)
+该爬虫对应与crawl 下的hudong_baike 文件夹。该爬虫基于scrapy框架，爬取电影类数据，包含电影13866部，演员5931人，演员电影间联系800个，电影与类别间联系14558,其中类别为‘其他’的电影有0个。对应数据集可在[坚果云下载](https://www.jianguoyun.com/p/Db3wsKQQq_6CBxi7tGs)
 
 数据库的结构和百度百科的一致，也可通过creat_sql.txt 文件创建。    
 
@@ -80,9 +80,10 @@ mysql -uroot -pnlp < creat_sql.txt
 结构化数据到RDF由两种主要方式，一个是通过[direct mapping](https://www.w3.org/TR/rdb-direct-mapping/)，另一个通过[R2RML](https://www.w3.org/TR/r2rml/#acknowledgements)语言这种，基于R2RML语言的方式更为灵活，定制性强。对于R2RML有一些好用的工具，此处我们使用d2rq工具，它基于R2RML-KIT。
 
 ## direct mapping
+根据启发式规则，编写从数据库到RDF的映射。
 TODO
 ## D2RQ
-TODO
+运行struct_to_rdf 下的 get_ttl.sh 脚本生成 mapping 文件和 最终的 NTriples 文件。文件存放在坚果云盘中，[百度百科](https://www.jianguoyun.com/p/DfRZwwoQq_6CBxjmkGw)、[互动百科](https://www.jianguoyun.com/p/Db9tA1AQq_6CBxjnkGw)。
 
 # TODO:
 * 增加基于sceapy框架的百度百科、互动百科、豆瓣三个网站的爬虫，获取半结构化信息    
