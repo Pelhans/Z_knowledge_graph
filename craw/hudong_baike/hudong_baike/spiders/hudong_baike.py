@@ -17,7 +17,8 @@ class HudongBaikeSpider(scrapy.Spider, object):
     name = 'hudong'
     allowed_domains = ["www.baike.com"]
 #    start_urls = ['http://www.baike.com/wiki/%E5%94%90%E4%BC%AF%E8%99%8E%E7%82%B9%E7%A7%8B%E9%A6%99'] # tangbohu
-    start_urls = ['http://www.baike.com/wiki/%E5%91%A8%E6%98%9F%E9%A9%B0&prd=button_doc_entry'] # zhouxingchi
+#    start_urls = ['http://www.baike.com/wiki/%E5%91%A8%E6%98%9F%E9%A9%B0&prd=button_doc_entry'] # zhouxingchi
+    start_urls = ['http://www.baike.com/wiki/%E6%9C%B1%E4%B8%80%E9%BE%99'] # zhouxingchi
     
     def _get_from_findall(self, tag_list):
         result = []        
@@ -154,4 +155,4 @@ class HudongBaikeSpider(scrapy.Spider, object):
         for link in new_urls:
             if link.startswith('http://www.baike.com/wiki'):
                 pass
-                yield scrapy.Request(link, callback=self.parse)
+#                yield scrapy.Request(link, callback=self.parse)

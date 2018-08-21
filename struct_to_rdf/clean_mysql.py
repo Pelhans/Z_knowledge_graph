@@ -35,13 +35,14 @@ class connec_mysql(object):
         max_movie_id = self.cursor.fetchall()[0][0]
         assert isinstance(max_movie_id, int)
         for movie_id in range(1, max_movie_id + 1):
-#        for movie_id in range(1, 1 + 10):
+#        for movie_id in range(1, 1 + 1):
             self.cursor.execute("SELECT * FROM movie_back WHERE movie_id = {};".format(movie_id))
             result = self.cursor.fetchall()
+            print("np.shape(result): ", np.shape(result))
             if np.shape(result) != (1, 14):
                 continue
-            movie_name = result[0][2].strip(u" 《》")
-            new_movie_list = [result[0][i] if i != 2 else movie_name for i in range(0, 14)]
+            new_movie_list = [ result[0][i].strip(u" 《》") if not isinstance(result[0][i], int) else result[0][i] for i in range(0, 14) ]
+#            new_movie_list = [result[0][i] if i != 2 else movie_name for i in range(0, 14)]
             new_movie_tuple = tuple(new_movie_list)
             sql = """ 
                 INSERT INTO movie(  movie_id, movie_bio, movie_chName, movie_foreName, movie_prodTime, movie_prodCompany,       movie_director, movie_screenwriter, movie_genre, movie_star, movie_length, movie_rekeaseTime, movie_language, movie_achiem )    VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
