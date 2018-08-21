@@ -3,6 +3,10 @@
 
 # 简介
 从零开始搭建一个小型知识图谱，并实现语义搜索和KBQA功能。<br>
+<p align="center">
+<img src="img/example_d2rq.png">
+<br/> 使用D2RQ的查询结果
+</p> 
 
 # 目录
 
