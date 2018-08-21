@@ -16,7 +16,8 @@
 
 * 结构化数据到 RDF 
     * Direct Mapping    
-    * D2RQ
+    * D2RQ: mapping 文件和 对应的NTriples 文件可以下载啦~您可以通过d2r-server进行查询使用   
+* 使用 Apache jena SPARQL endpoint     
 * TODO
 
 # 爬虫
@@ -84,6 +85,10 @@ mysql -uroot -pnlp < creat_sql.txt
 TODO
 ## D2RQ
 运行struct_to_rdf 下的 get_ttl.sh 脚本生成 mapping 文件和 最终的 NTriples 文件。文件存放在坚果云盘中，[百度百科](https://www.jianguoyun.com/p/DfRZwwoQq_6CBxjmkGw)、[互动百科](https://www.jianguoyun.com/p/Db9tA1AQq_6CBxjnkGw)。
+
+在生成mapping 文件后，可以根据需求定制一些格式上的要求，如将默认编码改为 "utf8"这种。您可以通过修改get_ttl.sh 来定制化您的生成方案，也可以使用默认值直接生成 mapping ttl 文件。根据默认生成的ttl 文件被保存到坚果云上，您可以下载后查阅，[百度百科mapping 文件](https://www.jianguoyun.com/p/DeYhwnkQq_6CBxiKtGw)、[互动百科 mapping 文件](https://www.jianguoyun.com/p/DVDl5b0Qq_6CBxiQtGw)。
+
+通过mapping 文件 和数据库，就可以使用 ./d2r-server kg_demo_movie_mapping.ttl开启查询端口进行查询了。
 
 # TODO:
 * 增加基于sceapy框架的百度百科、互动百科、豆瓣三个网站的爬虫，获取半结构化信息    
