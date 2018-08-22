@@ -4,3 +4,4 @@ BeautifulSoup4
 chardet
 pymysql
 sparqlwrapper
+jieba
