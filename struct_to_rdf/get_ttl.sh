@@ -17,3 +17,7 @@ for x in {hudong_baike,baidu_baike}; do
     sed -i '8a \@prefix : <http://www.kgdemo.com#> .' $name_ttl;
     ./dump-rdf -o $name_nt $name_ttl; # get NTriples
 done
+
+if [ $? -ne 0  ]; then
+        echo "Generate mapping and nt files failed. Terminated."
+        exit 1 

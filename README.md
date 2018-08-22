@@ -20,8 +20,16 @@
 
 * 结构化数据到 RDF 
     * Direct Mapping    
-    * D2RQ: mapping 文件和 对应的NTriples 文件可以下载啦~您可以通过d2r-server进行查询使用   
-* 使用 Apache jena SPARQL endpoint     
+    * D2RQ: mapping 文件和 对应的NTriples 文件可以下载啦~您可以通过d2r-server进行查询使用  
+
+* Apache jena    
+    * NTriples to TDB    
+    * Apache jena fuseki 的运行    
+    * Apache jena SPARQL endpoint    
+
+* KBQA    
+    * 基于 REfO 的简单KBQA    
+
 * TODO
 
 # 爬虫
@@ -94,10 +102,30 @@ TODO
 
 通过mapping 文件 和数据库，就可以使用 ./d2r-server kg_demo_movie_mapping.ttl开启查询端口进行查询了。
 
-# TODO:
+# Apache jena
+## NTriples to TDB
+TDB 是Jena 用于存储RDF的组件，是属于存储层面的技术。在单机情况下，它能够提供非常高的RDF存储性能。在下载完apache-jena 后，运行 ./tdbloader --loc="../tdb/" "path/to/NTriples" 把 NTriples 加载到TDB中。
+
+## Apache jena fuseki 的运行
+
+在Apache Jena fuseki 服务器的配置文件中，可以指定本体，从而实现推理机制。该本体文件是从顶向下定义的，采用protege 软件编辑生成，格式为Turtle，放在struct_to_rdf/kg_movie_tultle.owl。该配置文件中另一个需要修改的是TDB 文件夹的路径，改成上面TDB 文件夹路径即可。
+
+需要注意的是，每次运行fuseki服务器后，会在TDB文件夹内生成一些以prefix*开头的文件，重新运行fuseki服务的话不删除它们可能会报错。
+
+## Apache jena SPARQL endpoint
+
+Jena fuseki开启服务后，可以通过网页端和命令行方式进行 SPQRQL查询。接下来我们可以直接进行SPARQL查询，也可以把自然语言转换为 SPARQL 模板后进行查询。
+
+# KBQA
+## 基于 REfO 的简单KBQA
+TODO
+
+
+# PLAN:
 * 增加基于sceapy框架的百度百科、互动百科、豆瓣三个网站的爬虫，获取半结构化信息    
 * 根据zhishi.me建立的文章，使用属性传播等算法建立三个独立的知识图谱    
 * 使用知识融合技术，对以上三个知识图谱进行内部融合和互相间融合    
 * 对微信公众号、虎嗅网新闻的非结构化文本进行知识抽取，并与上面获得的知识图谱进行融合    
-* 基于知识图谱建立语义搜索系统    
+* 基于知识图谱建立语义搜索系统   
+* 基于知识图谱建立知识问答系统    
 * ....
