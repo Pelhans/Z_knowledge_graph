@@ -29,7 +29,7 @@ class Tagger:
         for p in dict_paths:
             jieba.load_userdict(p)
 
-    def get_word_objects(sentence):
+    def get_word_objects(self, sentence):
         """
         Get :class:WOrd(token, pos)
         """

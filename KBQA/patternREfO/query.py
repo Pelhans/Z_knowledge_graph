@@ -19,7 +19,6 @@ if __name__ == "__main__":
 
         for rule in rules:
             query = rule.apply(seg_list)
-            print "query: ", query
             if query:
                 sparql_base.setQuery(query)
                 sparql_base.setReturnFormat(JSON)
