@@ -2,7 +2,7 @@
 
 # Export dict for movie and actor in hudong and baidu DB;
 # You need change the user and pwd for your own DB;
-mysql -uroot -pnlp < get_dict.txt 
+mysql -uroot -pnlp < ./data/get_dict.txt 
 
 sudo cp /var/lib/mysql-files/*Name.txt .
 
