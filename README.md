@@ -29,6 +29,8 @@
 
 * KBQA    
     * 基于 REfO 的简单KBQA    
+* 语义搜索
+    * 基于elasticsearch 的简单语义搜索(Ongoing)
 
 * TODO
 
@@ -118,8 +120,29 @@ Jena fuseki开启服务后，可以通过网页端和命令行方式进行 SPQRQ
 
 # KBQA
 ## 基于 REfO 的简单KBQA
-TODO
+代码参考自[基于 REfO 的 KBQA 实现及示例](http://openkg.cn/tool/eb483ee4-3be1-4d4b-974d-970d35307e8d)。    
+## 代码结构
+代码结构为    
+.:
+data/  get_dict.sh  query.py  utils/
+./data:
+actorName.txt  get_dict.txt  movieName.txt
+./utils:
+__init__.py  __init__.pyc  rules.py  rules.pyc  word_tagging.py  word_tagging.pyc
 
+* 其中data 目录存放由数据库倒出生成的字典文件，用于扩展jieba分词，由 get_dict.sh 生成。    
+* utils/ 内存放查询预处理的模块。word_tagging.py 用于将词的文本和词性打包，视为词对象，对应:class:Word(token,pos)。rules.py 内定义各种规则并将自然语言转换为SPARQL查询语言，最终以JSON返回结果。    
+* query.py 为程序入口，运行它来进行简单的KBQA。
+
+### 示例
+<p align="center">
+<img src="img/example_REfO_KBQA.png">
+<br/> 基于REfO的KBQA
+</p> 
+
+# 语义搜索
+## 基于elasticsearch 的简单语义搜索
+TODO
 
 # PLAN:
 * 增加基于sceapy框架的百度百科、互动百科、豆瓣三个网站的爬虫，获取半结构化信息    
