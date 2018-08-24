@@ -1,3 +1,4 @@
 KBQA/actorName.txt 
 KBQA/movieName.txt
 *.json
+*.pyc

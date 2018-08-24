@@ -24,7 +24,7 @@ class connec_mysql(object):
             host='localhost',
             user='root',
             passwd='nlp',
-            db='hudong_baike',
+            db='baidu_baike',
             charset='utf8mb4',
             use_unicode=True
             )    
@@ -43,8 +43,7 @@ class connec_mysql(object):
             max_id = result[0][0] if result[0][0] != None else 0
             print("max_id: ", max_id)
             f = open("{}.json".format(cate), "w+")
-            for id in range(1, 1+1):
-#            for id in range(1, max_id+1):
+            for id in range(1, max_id+1):
                 self.cursor.execute("SELECT * FROM {} WHERE {}_id = {}".format(cate, cate, id))
                 item_lists = self.cursor.fetchall()
 #                self.cursor.execute("SELECT COLUMN FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='{}'".format(cate))
@@ -52,7 +51,7 @@ class connec_mysql(object):
                 movie_column_attr = [ "movie_id", "movie_bio", "movie_chName", "movie_foreName", "movie_prodTime", "movie_prodCompany", "movie_director", "movie_screenwriter", "movie_genre", "movie_star", "movie_length", "movie_rekeaseTime", "movie_language", "movie_achiem"]
                 column_attr = actor_column_attr if cate == "actor" else movie_column_attr
 
-                if item_lists[0][0] == None and column_attr == None:
+                if item_lists == None and column_attr == None:
                     continue
                 try:
                     assert len(item_lists[0]) == 14 or len(item_lists[0]) == 11
