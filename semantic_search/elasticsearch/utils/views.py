@@ -12,21 +12,23 @@ from collections import defaultdict
 import jieba
 import re
 import cPickle
-
+#from Django import render
 import build_dict
 
-attr_map = build_dict.load_attr_map("/mnt/demo/search/data/attr_mapping.txt")
-attr_ac = cPickle.load(open("/mnt/demo/search/data/attr_ac.pkl","rb"))
-ent_dict = build_dict.load_entity_dict("/mnt/demo/search/data/all_entity.txt")
-val_dict = build_dict.load_val_dict("/mnt/demo/search/data/Person_val.txt")
+attr_map = build_dict.load_attr_map("../data/attr_mapping.txt")
+#attr_ac = cPickle.load(open("/mnt/demo/search/data/attr_ac.pkl","rb"))
+#ent_dict = build_dict.load_entity_dict("/mnt/demo/search/data/all_entity.txt")
+#val_dict = build_dict.load_val_dict("/mnt/demo/search/data/Person_val.txt")
 
 def home(request):
     return render(request, "home.html", {})
 
 def search(question):
     val_d = _val_linking(question)
+    print("val_d: ", val_d)
     lf_question = translate_NL2LF(question)
     answer, msg, query_type = _parse_query(lf_question)
+    print("answer: ", answer, "\n msg: ", msg, "\n query_type: ", query_type)
     # answer, msg, query_type = _parse_query(question)
     if msg == 'done':
         if query_type == 1:
@@ -434,3 +436,6 @@ def _val_linking(nl_query):
         ans[p] = val_dict[p.encode('utf-8')].decode('utf-8')
 
     return ans
+
+if __name__ == '__main__':
+    search("周星驰是谁?")

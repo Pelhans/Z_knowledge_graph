@@ -2,3 +2,4 @@ KBQA/actorName.txt
 KBQA/movieName.txt
 *.json
 *.pyc
+semantic_search/elasticsearch/data/*.txt
