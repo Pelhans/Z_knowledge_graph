@@ -30,7 +30,7 @@
 * KBQA    
     * 基于 REfO 的简单KBQA    
 * 语义搜索
-    * 基于elasticsearch 的简单语义搜索(Ongoing)
+    * 基于elasticsearch 的简单语义搜索 支持实体检索、实体属性检索和条件检索
 
 * TODO
 
@@ -142,7 +142,31 @@ __init__.py  __init__.pyc  rules.py  rules.pyc  word_tagging.py  word_tagging.py
 
 # 语义搜索
 ## 基于elasticsearch 的简单语义搜索
-TODO
+本项目是对浙大的[ 基于elasticsearch的KBQA实现及示例 ](http://openkg.cn/tool/elasticsearch-kbqa)的简化版本，并在自己的数据库上做了实现。
+### 代码结构
+文档结构为：
+.:
+data  query.py  utils
+./data:
+actor.json  all_entity.txt  attr_ac.pkl  attr_mapping.txt  baidu_baike.json  __init__.py  movie.json  total_val.txt
+./utils:
+build_dict.py  get_ac_attr.py  get_json.py  get_total_val.py  __init__.py  insert.py  query_cmd.sh  views.py
+
+其中data/文件夹 下的数据可以在[data数据](https://www.jianguoyun.com/p/DZVXpjwQq_6CBxjN5G0)下载。
+
+utils/ 下为程序核心文件:
+* get_ac_attr.py 用来得到属性的AC自动机文件-attr_ac.pkl    
+* get_json.py 用来得到actor.json 和 movie.json文件，将二者去重合一后得到baidu_baike.json.    
+* insert.py将数据插入到elasticsearch中。    
+* build_dict.py 将上面产生的文件加载进来    
+* query_cmd.sh 是一个在shell 终端输入的查询样例。我们的目标就是把自然语言转化为这种格式，才能查询得到答案。    
+* view.py为核心文件，将输入的自然语言问题转化为逻辑表达式再到查询模板后进行查询得到答案。
+
+### 示例
+<p align="center">
+<img src="img/example_elastic_ss.png">
+<br/> 基于elasticsearch的简单语义搜索
+</p> 
 
 # PLAN:
 * 增加基于sceapy框架的百度百科、互动百科、豆瓣三个网站的爬虫，获取半结构化信息    
