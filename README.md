@@ -122,13 +122,13 @@ Jena fuseki开启服务后，可以通过网页端和命令行方式进行 SPQRQ
 ## 基于 REfO 的简单KBQA
 代码参考自[基于 REfO 的 KBQA 实现及示例](http://openkg.cn/tool/eb483ee4-3be1-4d4b-974d-970d35307e8d)。    
 ## 代码结构
-代码结构为    
-.:
-data/  get_dict.sh  query.py  utils/
-./data:
-actorName.txt  get_dict.txt  movieName.txt
-./utils:
-__init__.py  __init__.pyc  rules.py  rules.pyc  word_tagging.py  word_tagging.pyc
+代码结构为      
+.:     
+data/  get_dict.sh  query.py  utils/     
+./data:    
+actorName.txt  get_dict.txt  movieName.txt    
+./utils:    
+__init__.py  __init__.pyc  rules.py  rules.pyc  word_tagging.py  word_tagging.pyc    
 
 * 其中data 目录存放由数据库倒出生成的字典文件，用于扩展jieba分词，由 get_dict.sh 生成。    
 * utils/ 内存放查询预处理的模块。word_tagging.py 用于将词的文本和词性打包，视为词对象，对应:class:Word(token,pos)。rules.py 内定义各种规则并将自然语言转换为SPARQL查询语言，最终以JSON返回结果。    
@@ -144,13 +144,13 @@ __init__.py  __init__.pyc  rules.py  rules.pyc  word_tagging.py  word_tagging.py
 ## 基于elasticsearch 的简单语义搜索
 本项目是对浙大的[ 基于elasticsearch的KBQA实现及示例 ](http://openkg.cn/tool/elasticsearch-kbqa)的简化版本，并在自己的数据库上做了实现。
 ### 代码结构
-文档结构为：
-.:
-data  query.py  utils
-./data:
-actor.json  all_entity.txt  attr_ac.pkl  attr_mapping.txt  baidu_baike.json  __init__.py  movie.json  total_val.txt
-./utils:
-build_dict.py  get_ac_attr.py  get_json.py  get_total_val.py  __init__.py  insert.py  query_cmd.sh  views.py
+文档结构为：    
+.:    
+data  query.py  utils    
+./data:    
+actor.json  all_entity.txt  attr_ac.pkl  attr_mapping.txt  baidu_baike.json  __init__.py  movie.json  total_val.txt    
+./utils:    
+build_dict.py  get_ac_attr.py  get_json.py  get_total_val.py  __init__.py  insert.py  query_cmd.sh  views.py    
 
 其中data/文件夹 下的数据可以在[data数据](https://www.jianguoyun.com/p/DZVXpjwQq_6CBxjN5G0)下载。
 
