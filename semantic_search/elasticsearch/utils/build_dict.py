@@ -2,6 +2,10 @@ import ahocorasick
 import cPickle
 from collections import defaultdict
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 entity_list_file = './data/all_entity.txt'
 entity_out_path = './data/ent_ac.pkl'
 attr_list_file = './data/attr_mapping.txt'
@@ -57,8 +61,11 @@ def load_val_dict(val_file):
     f = open(val_file)
     val_attr_map = {}
     for line in f:
-        parts = line.strip().split(" ")        
-        val_attr_map[parts[0]] = parts[1]
+        parts = line.strip().split(" ")
+        if line == "\n" or len(parts) < 2:
+            continue
+        new_str = u" ".join(parts[0:len(parts)-1]).encode('utf-8')
+        val_attr_map[u" ".join(parts[0:len(parts)-1]).encode('utf-8')] = parts[-1]
     return val_attr_map
 
 

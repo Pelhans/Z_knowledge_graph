@@ -4,8 +4,8 @@ curl -XGET 'localhost:9200/demo/baidu_baike/_search?&pretty' -H 'Content-Type:ap
 {
     "query":{
         "bool":{
-            "must":{
-                "term":{"subj":"周星驰"}
+            "filter":{
+                "term":{"subj":"朱一龙"}
             }
         }
     }      

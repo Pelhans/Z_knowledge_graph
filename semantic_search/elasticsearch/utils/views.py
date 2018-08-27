@@ -1,54 +1,47 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import requests
-from Queue import Queue
-import urllib
-try:
-    import simplejson as json
-except:
-    import json
 from collections import defaultdict
+from Queue import Queue
+import requests
+import commands
+import cPickle
+import urllib
+import json
 import jieba
 import re
-import cPickle
-#from Django import render
-import build_dict
+import os
 
-attr_map = build_dict.load_attr_map("../data/attr_mapping.txt")
-#attr_ac = cPickle.load(open("/mnt/demo/search/data/attr_ac.pkl","rb"))
-#ent_dict = build_dict.load_entity_dict("/mnt/demo/search/data/all_entity.txt")
-#val_dict = build_dict.load_val_dict("/mnt/demo/search/data/Person_val.txt")
+from . import build_dict
 
-def home(request):
-    return render(request, "home.html", {})
+attr_map = build_dict.load_attr_map(os.path.join(__package__, "../data/attr_mapping.txt") )
+attr_ac = cPickle.load(open(os.path.join(__package__, "../data/attr_ac.pkl"),"rb"))
+ent_dict = build_dict.load_entity_dict(os.path.join(__package__, "../data/all_entity.txt") )
+val_dict = build_dict.load_val_dict(os.path.join(__package__, "../data/total_val.txt") )
 
 def search(question):
     val_d = _val_linking(question)
-    print("val_d: ", val_d)
     lf_question = translate_NL2LF(question)
     answer, msg, query_type = _parse_query(lf_question)
-    print("answer: ", answer, "\n msg: ", msg, "\n query_type: ", query_type)
-    # answer, msg, query_type = _parse_query(question)
     if msg == 'done':
         if query_type == 1:
-            return render(request, "entity.html", {"question":question, "ans":answer})
+            return answer
         elif query_type == 4:
-            return render(request, "entity_list.html", {"question":question, "ans":answer})
+            return answer
         elif query_type == 3:
             if isinstance(answer, int):
                 answer = str(answer)
-            return render(request, "message.html", {"question":question, "ans":answer})
+            return answer.encode('utf-8')
     elif msg == 'none':
-        return render(request, "message.html", {"question":question, "ans":"find nothing"})
+        return "find nothing"
     else:
-        return render(request, "message.html", {"question":question, "ans":answer + " " + msg})
+        return answer + " " + msg
 
 def _parse_query(question):
     answer, query_type = "", None
     question = question.upper()
     question = question.replace(" ","")
-    parts = re.split("：|:|<|>|<=|>=", question)
+    parts = re.split(u"：|:|<|>|<=|>=", question)
     en = _entity_linking(parts[0])
     if len(parts) < 2:
         if len(en):
@@ -82,10 +75,10 @@ def _search_multihop_SP(parts):
             return '执行到: ' + has_done, '==> 对应的结果为:' + v + ', 知识库中没有该实体: ' + v
         card, msg = _search_single_subj(en[-1])
         p = _map_predicate(parts[i])
-        if not len(p):
+        if not len(p) or card == None:
             return '执行到: ' + has_done, '==> 知识库中没有该属性: ' + parts[i]
         p = p[0]
-        if p not in card:
+        if p == None:
             return '执行到: ' + has_done, '==> 实体 ' + card['subj'] + ' 没有属性 ' + p
         v = card[p]
         if isinstance(v,int):
@@ -211,19 +204,15 @@ def _search_multi_PO(exps, bool_ops):
 
 def _search_single_subj(entity_name):
     query = json.dumps({"query": { "bool":{"filter":{"term" :{"subj" : entity_name}}}}})
-    response = requests.get("http://localhost:9200/demo/person/_search", data = query)
-    res = json.loads(response.content)
-
+    response = commands.getoutput("curl -XGET 'localhost:9200/demo/baidu_baike/_search?&pretty' -H 'Content-Type:application/json' -d' {} ' -s".format(query))
+#    response = requests.get("http://localhost:9200/demo/baidu_baike/_search", data = query)
+    res = json.loads(response)
     if res['hits']['total'] == 0:
         return None, 'entity'
     else:
         card = dict()
         card['subj'] = entity_name
         s = res['hits']['hits'][0]['_source']
-        if 'height' in s:
-            card['height'] = s['height']
-        if 'weight' in s:
-            card['weight'] = s['weight']
         for po in s['po']:
             if po['pred'] in card:
                 card[po['pred']] += ' ' + po['obj']
@@ -381,6 +370,8 @@ def _map_predicate(pred_name, map_attr=True):   #找出一个字符串中是否�
     def _map_attr(word_list):
         ans = []
         for word in word_list:
+            if attr_map[word.encode('utf-8')] == []:
+                continue
             ans.append(attr_map[word.encode('utf-8')][0].decode('utf-8'))
         return ans
 
