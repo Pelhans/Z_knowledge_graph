@@ -7,5 +7,7 @@ from __future__ import print_function
 from utils import views
 
 if __name__ == '__main__':
-    answer = views.search(u"唐伯虎点秋香的对白语言？")
-    print("Answer: ", answer)
+    while True:
+        question = raw_input()
+        answer = views.search(question.decode('utf-8'))
+        print("Your question is : ", question, "\nAnswer: ", answer)
