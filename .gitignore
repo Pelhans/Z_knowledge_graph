@@ -3,4 +3,5 @@ KBQA/movieName.txt
 *.json
 *.pyc
 semantic_search/elasticsearch/data/*.txt
-semantic_search/elasticsearch/data/attr_ac.pkl
+semantic_search/elasticsearch/data/attr_ac.pkl 
+ie/deepdive/udf/bazaar/*
