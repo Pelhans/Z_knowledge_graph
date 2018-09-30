@@ -5,3 +5,6 @@ KBQA/movieName.txt
 semantic_search/elasticsearch/data/*.txt
 semantic_search/elasticsearch/data/attr_ac.pkl 
 ie/deepdive/udf/bazaar/*
+ie/deepdive/*.txt
+ie/deepdive/*.csv
+ie/deepdive/run/*

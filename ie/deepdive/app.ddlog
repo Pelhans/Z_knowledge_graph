@@ -1,0 +1,34 @@
+@source
+actor_movie_dbdata(
+    @key
+    actor_name text,
+    @key
+    movie_name text
+).
+
+articles(
+    id text,
+    content text
+).
+
+sentences(
+    doc_id text,
+    sentence_index int,
+    sentences_text text,
+    tokens text[],
+    lemmas text[],
+    pos_tags text[],
+    ner_tags text[],
+    doc_offsets int[],
+    dep_types text[],
+    dep_tokens int[]
+).
+
+function nlp_markup over (
+        doc_id text,
+        content text
+    ) returns rows like sentences
+    implementation "udf/nlp_markup.sh" handles tsv lines.
+
+sentences += nlp_markup(doc_id, content) :-
+    articles(doc_id, content).
