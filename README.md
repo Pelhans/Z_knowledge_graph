@@ -21,6 +21,10 @@
 * 结构化数据到 RDF 
     * Direct Mapping    
     * D2RQ: mapping 文件和 对应的NTriples 文件可以下载啦~您可以通过d2r-server进行查询使用  
+    
+* 非结构化文本的知识抽取
+   * 基于Deepdive的知识抽取(ONGOING)    
+   * 基于TextRunner 的开放知识抽取
 
 * Apache jena    
     * NTriples to TDB    
@@ -29,10 +33,10 @@
 
 * KBQA    
     * 基于 REfO 的简单KBQA    
+    
 * 语义搜索
     * 基于elasticsearch 的简单语义搜索 支持实体检索、实体属性检索和条件检索
 
-* TODO
 
 # 爬虫
 
