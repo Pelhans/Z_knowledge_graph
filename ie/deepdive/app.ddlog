@@ -110,3 +110,35 @@ movie_mention(p2, p2_name, same_doc, same_sentence, p2_begin, _),
 num_e < 5,
 p1_name != p2_name,
 p1_begin != p2_begin.
+
+play_feature(        
+    p1_id text,             
+    p2_id text,             
+    feature text            
+).
+
+function extract_play_features over (
+    p1_id          text,
+    p2_id          text,
+    p1_begin_index int,
+    p1_end_index   int, 
+    p2_begin_index int, 
+    p2_end_index   int, 
+    doc_id         text,
+    sent_index     int, 
+    tokens         text[],
+    lemmas         text[],
+    pos_tags       text[],
+    ner_tags       text[],
+    dep_types      text[],
+    dep_tokens     int[]
+) returns rows like transaction_feature
+implementation "udf/extract_play_features.py" handles tsv lines.
+
+play_feature += extract_play_features(
+p1_id, p2_id, p1_begin_index, p1_end_index, p2_begin_index, p2_end_index,
+doc_id, sent_index, tokens, lemmas, pos_tags, ner_tags, dep_types, dep_tokens
+) :-                                         
+actor_mention(p1_id, _, doc_id, sent_index, p1_begin_index, p1_end_index),
+movie_mention(p2_id, _, doc_id, sent_index, p2_begin_index, p2_end_index),
+sentences(doc_id, sent_index, _, tokens, lemmas, pos_tags, ner_tags, _, dep_types, dep_tokens).
