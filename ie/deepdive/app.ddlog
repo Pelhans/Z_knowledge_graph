@@ -11,6 +11,11 @@ articles(
     content text
 ).
 
+small_articles(
+    id text,
+    content text
+).
+
 sentences(
     doc_id text,
     sentence_index int,
@@ -31,4 +36,77 @@ function nlp_markup over (
     implementation "udf/nlp_markup.sh" handles tsv lines.
 
 sentences += nlp_markup(doc_id, content) :-
-    articles(doc_id, content).
+    small_articles(doc_id, content).
+
+actor_mention(
+    mention_id text,
+    mention_text text,
+    doc_id text,
+    sentences_index int,
+    begin_index int,
+    end_index int
+).
+
+movie_mention(
+    mention_id text,
+    mention_text text,
+    doc_id text,
+    sentences_index int,
+    begin_index int,
+    end_index int
+).
+
+function map_actor_mention over(
+    doc_id text,
+    sentence_index int,
+    tokens text[],
+    pos_tags text[],
+    ner_tags text[]
+) returns rows like actor_mention
+implementation "udf/map_actor_mention.py" handles tsv lines.
+
+actor_mention += map_actor_mention(
+doc_id, sentence_index, tokens, pos_tags, ner_tags
+) :-
+sentences(doc_id, sentence_index, _, tokens, _, pos_tags, ner_tags, _, _, _).
+
+function map_movie_mention over(
+    doc_id text,
+    sentence_index int,
+    tokens text[],
+    pos_tags text[],
+    ner_tags text[]
+) returns rows like movie_mention
+implementation "udf/map_movie_mention.py" handles tsv lines.
+
+movie_mention += map_movie_mention(
+doc_id, sentence_index, tokens, pos_tags, ner_tags
+) :-
+sentences(doc_id, sentence_index, _, tokens, _, pos_tags, ner_tags, _, _, _).
+
+play_candidate(
+    p1_id text,
+    p1_name text,
+    p2_id text,
+    p2_name text
+).
+
+num_entity(doc_id, sentence_index, COUNT(p) + COUNT(q)) :-
+actor_mention(p, _, doc_id, sentence_index, _, _),
+movie_mention(q, _, doc_id, sentence_index, _, _).
+
+function map_play_candidate over (
+    p1_id text,
+    p1_name text,
+    p2_id text,
+    p2_name text
+) returns rows like play_candidate
+implementation "udf/map_play_candidate.py" handles tsv lines.
+
+play_candidate += map_play_candidate(p1, p1_name, p2, p2_name) :-
+num_entity(same_doc, same_sentence, num_e),
+actor_mention(p1, p1_name, same_doc, same_sentence, p1_begin, _),
+movie_mention(p2, p2_name, same_doc, same_sentence, p2_begin, _),
+num_e < 5,
+p1_name != p2_name,
+p1_begin != p2_begin.
