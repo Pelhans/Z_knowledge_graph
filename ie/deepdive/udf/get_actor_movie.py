@@ -47,7 +47,7 @@ class connec_mysql(object):
                 movie_chName, movie_foreName = movie_list[0]
                 for item_actor in [actor_chName, actor_foreName]:
                     for item_movie in [movie_chName, movie_foreName]:
-                        if item_actor != "None" and item_movie != "None":
+                        if item_actor not in  ["None", ""] and item_movie not in ["None", ""]:
                             outfile.write(item_actor + "," + item_movie + "\n")
 
         outfile.close()
