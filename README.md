@@ -23,8 +23,8 @@
     * D2RQ: mapping 文件和 对应的NTriples 文件可以下载啦~您可以通过d2r-server进行查询使用  
     
 * 非结构化文本的知识抽取
-   * 基于Deepdive的知识抽取(ONGOING)    
-   * 基于TextRunner 的开放知识抽取
+   * 基于Deepdive的知识抽取    
+   * 基于TextRunner 的开放知识抽取(ONGOING)
 
 * Apache jena    
     * NTriples to TDB    
@@ -107,6 +107,17 @@ TODO
 在生成mapping 文件后，可以根据需求定制一些格式上的要求，如将默认编码改为 "utf8"这种。您可以通过修改get_ttl.sh 来定制化您的生成方案，也可以使用默认值直接生成 mapping ttl 文件。根据默认生成的ttl 文件被保存到坚果云上，您可以下载后查阅，[百度百科mapping 文件](https://www.jianguoyun.com/p/DeYhwnkQq_6CBxiKtGw)、[互动百科 mapping 文件](https://www.jianguoyun.com/p/DVDl5b0Qq_6CBxiQtGw)。
 
 通过mapping 文件 和数据库，就可以使用 ./d2r-server kg_demo_movie_mapping.ttl开启查询端口进行查询了。
+
+# 非结构化文本的知识抽取
+## 基于Deepdive的知识抽取
+
+Deepdive是由斯坦福大学InfoLab实验室开发的一个开源知识抽取系统。它通过弱监督学习，从非结构化的文本中抽取结构化的关系数
+据 。本次实战基于OpenKG上的[支持中文的deepdive：斯坦福大学的开源知识抽取工具（三元组抽取）](http://www.openkg.cn/    dataset/cn-deepdive)，我们基于此，抽取电影领域的演员-电影关系。
+
+详细介绍请见[从零开始构建知识图谱（五）Deepdive抽取演员-电影间关系](https://zhuanlan.zhihu.com/p/46560845)
+
+## 基于TextRunner 的开放知识抽取
+TODO
 
 # Apache jena
 ## NTriples to TDB
