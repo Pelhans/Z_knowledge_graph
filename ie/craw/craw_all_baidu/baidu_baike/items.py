@@ -21,3 +21,4 @@ class BaiduBaikeItem(scrapy.Item):
     interLink = scrapy.Field()
     exterLink = scrapy.Field()
     relateLemma = scrapy.Field()
+    all_text = scrapy.Field()

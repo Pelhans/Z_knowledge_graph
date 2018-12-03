@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 # coding=utf-8
 
 from __future__ import absolute_import
@@ -83,6 +83,10 @@ class BaiduBaikeSpider(scrapy.Spider, object):
             new_full_url = urlparse.urljoin('https://baike.baidu.com/', new_url)
             exter_links_dict[url_name] = new_full_url
         item['exterLink'] = json.dumps(exter_links_dict)
+
+        all_para = soup.find_all('div',class_="para")
+        all_text = [para.get_text() for para in all_para]
+        item['all_text'] = ' '.join(all_text)
 
         yield item
 

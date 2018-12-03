@@ -41,6 +41,7 @@ class BaiduBaikePipeline(object):
         interLink = str(item['interLink']).decode('utf-8')
         exterLink = str(item['exterLink']).decode('utf-8')
         relateLemma = str(item['relateLemma']).decode('utf-8')
+        all_text = str(item['all_text']).decode('utf-8')
 
         self.cursor.execute("SELECT disambi FROM lemmas;")
         disambi_list = self.cursor.fetchall()
@@ -52,9 +53,9 @@ class BaiduBaikePipeline(object):
             else:
                 title_id = result[0] + 1
             sql = """
-            INSERT INTO lemmas(title, title_id, abstract, infobox, subject, disambi, interPic, interLink, exterLink, relateLemma ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO lemmas(title, title_id, abstract, infobox, subject, disambi, interPic, interLink, exterLink, relateLemma, all_text ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-            self.cursor.execute(sql, (title, title_id, abstract, infobox, subject, disambi, interPic, interLink, exterLink, relateLemma ))
+            self.cursor.execute(sql, (title, title_id, abstract, infobox, subject, disambi, interPic, interLink, exterLink, relateLemma, all_text ))
             self.conn.commit()
         else:
             print("#" * 20, "Got a duplict lemmas!!")
