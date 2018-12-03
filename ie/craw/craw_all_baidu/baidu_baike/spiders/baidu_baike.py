@@ -17,8 +17,8 @@ import json
 class BaiduBaikeSpider(scrapy.Spider, object):
     name = 'baidu'
     allowed_domains = ["baike.baidu.com"]
-    start_urls = ['https://baike.baidu.com/item/%E5%91%A8%E6%98%9F%E9%A9%B0/169917?fr=aladdin']
-#    start_urls = ['https://baike.baidu.com/item/%E4%B8%8A%E6%B5%B7/114606'] # 上海
+#    start_urls = ['https://baike.baidu.com/item/%E5%91%A8%E6%98%9F%E9%A9%B0/169917?fr=aladdin']
+    start_urls = ['https://baike.baidu.com/item/%E4%B8%8A%E6%B5%B7/114606'] # 上海
 #    start_urls = ['https://baike.baidu.com/item/%E4%B8%83%E5%B0%8F%E7%A6%8F']
     
     def _get_from_findall(self, tag_list):
@@ -36,16 +36,28 @@ class BaiduBaikeSpider(scrapy.Spider, object):
 
         mainTitle = response.xpath("//dd[@class='lemmaWgt-lemmaTitle-title']/h1/text()").extract()
         subTitle = response.xpath("//dd[@class='lemmaWgt-lemmaTitle-title']/h2/text()").extract()
-        item['title'] = ' '.join(mainTitle)
-        item['disambi'] = ' '.join(mainTitle + subTitle)
+        try:
+            item['title'] = ' '.join(mainTitle)
+        except:
+            item['title'] = None
+        try:
+            item['disambi'] = ' '.join(mainTitle + subTitle)
+        except:
+            item['disambi'] = None
 
         soup = BeautifulSoup(response.text, 'lxml')
         summary_node = soup.find("div", class_ = "lemma-summary")
-        item['abstract'] = summary_node.get_text().replace("\n"," ")
+        try:
+            item['abstract'] = summary_node.get_text().replace("\n"," ")
+        except:
+            item['abstract'] = None
 
         page_category = response.xpath("//dd[@id='open-tag-item']/span[@class='taglist']/text()").extract()
         page_category = [l.strip() for l in page_category]
-        item['subject'] = ','.join(page_category)
+        try:
+            item['subject'] = ','.join(page_category)
+        except:
+            item['subject'] = None
 
         # Get infobox
         all_basicInfo_Item = soup.find_all("dt", class_="basicInfo-item name")
@@ -57,12 +69,18 @@ class BaiduBaikeSpider(scrapy.Spider, object):
         info_dict = {}
         for i, info in enumerate(basic_item):
             info_dict[info] = basic_value[i]
-        item['infobox'] = json.dumps(info_dict)
+        try:
+            item['infobox'] = json.dumps(info_dict)
+        except:
+            item['infobox'] = None
        
         # Get inter picture
         selector = scrapy.Selector(response)
         img_path = selector.xpath("//img[@class='picture']/@src").extract()
-        item['interPic'] = ','.join(img_path)
+        try:
+            item['interPic'] = ','.join(img_path)
+        except:
+            item['interPic'] = None
 
         inter_links_dict = {}
         soup = BeautifulSoup(response.text, 'lxml')
@@ -72,7 +90,10 @@ class BaiduBaikeSpider(scrapy.Spider, object):
             url_name = link.get_text()
             new_full_url = urlparse.urljoin('https://baike.baidu.com/', new_url)
             inter_links_dict[url_name] = new_full_url
-        item['interLink'] = json.dumps(inter_links_dict)
+        try:
+            item['interLink'] = json.dumps(inter_links_dict)
+        except:
+            item['interLink'] = None
         
         exter_links_dict = {}
         soup = BeautifulSoup(response.text, 'lxml')
@@ -82,11 +103,17 @@ class BaiduBaikeSpider(scrapy.Spider, object):
             url_name = link.get_text()
             new_full_url = urlparse.urljoin('https://baike.baidu.com/', new_url)
             exter_links_dict[url_name] = new_full_url
-        item['exterLink'] = json.dumps(exter_links_dict)
+        try:
+            item['exterLink'] = json.dumps(exter_links_dict)
+        except:
+            item['exterLink'] = None
 
         all_para = soup.find_all('div',class_="para")
         all_text = [para.get_text() for para in all_para]
-        item['all_text'] = ' '.join(all_text)
+        try:
+            item['all_text'] = ' '.join(all_text)
+        except:
+            item['all_text'] = None
 
         yield item
 
@@ -96,3 +123,4 @@ class BaiduBaikeSpider(scrapy.Spider, object):
             new_url = link["href"]
             new_full_url = urlparse.urljoin('https://baike.baidu.com/', new_url)
             yield scrapy.Request(new_full_url, callback=self.parse)
+
