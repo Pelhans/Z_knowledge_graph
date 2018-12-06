@@ -17,12 +17,12 @@ import re
 import urlparse
 import json
 
-class BaiduBaikeSpider(scrapy.Spider, object):
-    name = 'baidu'
+class BaiduBaike2Spider(scrapy.Spider, object):
+    name = 'baidu2'
     allowed_domains = ["baike.baidu.com"]
 #    start_urls = ['https://baike.baidu.com/item/%E5%91%A8%E6%98%9F%E9%A9%B0/169917?fr=aladdin']
-    start_urls = ['https://baike.baidu.com/item/%E4%B8%8A%E6%B5%B7/114606'] # 上海
-#    start_urls = ['https://baike.baidu.com/item/%E4%B8%83%E5%B0%8F%E7%A6%8F']
+#    start_urls = ['https://baike.baidu.com/item/%E4%B8%8A%E6%B5%B7/114606'] # 上海
+    start_urls = ['https://baike.baidu.com/item/%E4%B8%83%E5%B0%8F%E7%A6%8F']
     
     def _get_from_findall(self, tag_list):
         result = []        
@@ -126,3 +126,12 @@ class BaiduBaikeSpider(scrapy.Spider, object):
             new_url = link["href"]
             new_full_url = urlparse.urljoin('https://baike.baidu.com/', new_url)
             yield scrapy.Request(new_full_url, callback=self.parse)
+
+#configure_logging()
+#runner = CrawlerRunner()
+#runner.crawl(BaiduBaikeSpider)
+#runner.crawl(BaiduBaike2Spider)
+#d = runner.join()
+#d.addBoth(lambda _: reactor.stop())
+#
+#reactor.run()

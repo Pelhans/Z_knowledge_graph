@@ -43,9 +43,10 @@ class BaiduBaikePipeline(object):
         relateLemma = str(item['relateLemma']).decode('utf-8')
         all_text = str(item['all_text']).decode('utf-8')
 
-        self.cursor.execute("SELECT disambi FROM lemmas;")
-        disambi_list = self.cursor.fetchall()
-        if (disambi,) not in disambi_list :
+#        self.cursor.execute("SELECT disambi FROM lemmas;")
+#        disambi_list = self.cursor.fetchall()
+#        if (disambi,) not in disambi_list :
+        try:
             self.cursor.execute("SELECT MAX(title_id) FROM lemmas")
             result = self.cursor.fetchall()[0]
             if None in result:
@@ -57,8 +58,9 @@ class BaiduBaikePipeline(object):
             """
             self.cursor.execute(sql, (title, title_id, abstract, infobox, subject, disambi, interPic, interLink, exterLink, relateLemma, all_text ))
             self.conn.commit()
-        else:
-            print("#" * 20, "Got a duplict lemmas!!")
+        except Exception as e:
+            print("#"*50, "An error when insert into mysql!!")
+            print(e)
         return item
 
     def close_spider(self, spider):
