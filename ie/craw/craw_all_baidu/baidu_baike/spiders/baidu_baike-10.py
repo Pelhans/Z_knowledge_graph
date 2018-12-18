@@ -18,9 +18,9 @@ import urlparse
 import json
 
 class BaiduBaikeSpider(scrapy.Spider, object):
-    name = 'baidu4'
+    name = 'baidu10'
     allowed_domains = ["baike.baidu.com"]
-    start_urls = ['https://baike.baidu.com/item/%E9%AB%98%E6%A3%98%E9%BE%99']
+    start_urls = ['https://baike.baidu.com/item/%E7%A7%92%E6%87%82%E7%9C%8B%E7%93%A6%E7%89%B9']
     
     def _get_from_findall(self, tag_list):
         result = []        

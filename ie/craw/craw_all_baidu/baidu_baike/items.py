@@ -17,6 +17,8 @@ class BaiduBaikeItem(scrapy.Item):
     infobox = scrapy.Field()
     subject = scrapy.Field()
     disambi = scrapy.Field()
+    redirect = scrapy.Field()
+    curLink = scrapy.Field()
     interPic = scrapy.Field()
     interLink = scrapy.Field()
     exterLink = scrapy.Field()

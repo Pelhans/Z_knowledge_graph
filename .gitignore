@@ -10,3 +10,4 @@ ie/deepdive/run/*
 ie/deepdive/*.csv
 *.txt
 *.csv
+ie/craw/craw_all_baidu/craws/*

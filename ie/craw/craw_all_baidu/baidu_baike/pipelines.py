@@ -37,30 +37,43 @@ class BaiduBaikePipeline(object):
         infobox = str(item['infobox']).decode('utf-8')
         subject = str(item['subject']).decode('utf-8')
         disambi = str(item['disambi']).decode('utf-8')
+        redirect = str(item['redirect']).decode('utf-8')
+        curLink = str(item['curLink']).decode('utf-8')
         interPic = str(item['interPic']).decode('utf-8')
         interLink = str(item['interLink']).decode('utf-8')
         exterLink = str(item['exterLink']).decode('utf-8')
         relateLemma = str(item['relateLemma']).decode('utf-8')
-        all_text = str(item['all_text']).decode('utf-8')
+        all_text = str(item['all_text']).decode('utf-8').encode('utf-8')
 
 #        self.cursor.execute("SELECT disambi FROM lemmas;")
 #        disambi_list = self.cursor.fetchall()
 #        if (disambi,) not in disambi_list :
+        self.cursor.execute("SELECT MAX(title_id) FROM lemmas")
+        result = self.cursor.fetchall()[0]
+        if None in result:
+            title_id = 1
+        else:
+            title_id = result[0] + 1
+        sql = """
+        INSERT INTO lemmas(title, title_id, abstract, infobox, subject, disambi, redirect, curLink, interPic, interLink, exterLink, relateLemma, all_text ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
         try:
-            self.cursor.execute("SELECT MAX(title_id) FROM lemmas")
-            result = self.cursor.fetchall()[0]
-            if None in result:
-                title_id = 1
-            else:
-                title_id = result[0] + 1
-            sql = """
-            INSERT INTO lemmas(title, title_id, abstract, infobox, subject, disambi, interPic, interLink, exterLink, relateLemma, all_text ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """
-            self.cursor.execute(sql, (title, title_id, abstract, infobox, subject, disambi, interPic, interLink, exterLink, relateLemma, all_text ))
+#            disambi_list = self.cursor.fetchall()
+#            if (disambi, ) in disambi_list:
+#                print ("result: ", disambi)
+            self.cursor.execute(sql, (title, title_id, abstract, infobox, subject, disambi, redirect, curLink, interPic, interLink, exterLink, relateLemma, all_text ))
             self.conn.commit()
+#            self.cursor.execute("SELECT disambi FROM lemmas" )
         except Exception as e:
-            print("#"*50, "An error when insert into mysql!!")
-            print(e)
+            print("#"*20, "\nAn error when insert into mysql!!\n")
+            print("curLink: ", curLink, "\n")
+            print(e, "\n", "#"*20)
+            try:
+                all_text = str('None').decode('utf-8').encode('utf-8')
+                self.cursor.execute(sql, (title, title_id, abstract, infobox, subject, disambi, redirect, curLink, interPic, interLink, exterLink, relateLemma, all_text ))
+                self.conn.commit()
+            except Exception as f:
+                print("Error without all_text!!!")
         return item
 
     def close_spider(self, spider):

@@ -80,7 +80,7 @@ HOST_IP = 'localhost'
 PORT = '3306'
 USER = 'root'
 PASSWD = 'nlp'
-DB_NAME = 'baidu_all'
+DB_NAME = 'baidu_duplicate'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

@@ -17,12 +17,10 @@ import re
 import urlparse
 import json
 
-class BaiduBaike5Spider(scrapy.Spider, object):
+class BaiduBaikeSpider(scrapy.Spider, object):
     name = 'baidu5'
     allowed_domains = ["baike.baidu.com"]
-    start_urls = ['https://baike.baidu.com/item/%E5%91%A8%E6%98%9F%E9%A9%B0/169917?fr=aladdin']
-#    start_urls = ['https://baike.baidu.com/item/%E4%B8%8A%E6%B5%B7/114606'] # 上海
-#    start_urls = ['https://baike.baidu.com/item/%E4%B8%83%E5%B0%8F%E7%A6%8F']
+    start_urls = ['https://baike.baidu.com/item/剑龙']
     
     def _get_from_findall(self, tag_list):
         result = []        
@@ -34,11 +32,12 @@ class BaiduBaike5Spider(scrapy.Spider, object):
     def parse(self, response):
         # tooooo ugly,,,, but can not use defaultdict
         item = BaiduBaikeItem()
-        for sub_item in [ 'title', 'title_id', 'abstract', 'infobox', 'subject', 'disambi', 'interPic', 'interLink', 'exterLink', 'relateLemma']:
+        for sub_item in [ 'title', 'title_id', 'abstract', 'infobox', 'subject', 'disambi', 'redirect', 'curLink', 'interPic', 'interLink', 'exterLink', 'relateLemma']:
             item[sub_item] = None
 
         mainTitle = response.xpath("//dd[@class='lemmaWgt-lemmaTitle-title']/h1/text()").extract()
         subTitle = response.xpath("//dd[@class='lemmaWgt-lemmaTitle-title']/h2/text()").extract()
+        redirect_name = response.xpath("//span[@class='viewTip-fromTitle']/text()").extract()
         try:
             item['title'] = ' '.join(mainTitle)
         except:
@@ -47,6 +46,14 @@ class BaiduBaike5Spider(scrapy.Spider, object):
             item['disambi'] = ' '.join(mainTitle + subTitle)
         except:
             item['disambi'] = None
+        try:
+            item['redirect'] = ' '.join(redirect_name)
+        except:
+            item['redirect'] = None
+        try:
+            item['curLink'] = str(response.url)
+        except:
+            item['curLink'] = None
 
         soup = BeautifulSoup(response.text, 'lxml')
         summary_node = soup.find("div", class_ = "lemma-summary")
@@ -126,12 +133,3 @@ class BaiduBaike5Spider(scrapy.Spider, object):
             new_url = link["href"]
             new_full_url = urlparse.urljoin('https://baike.baidu.com/', new_url)
             yield scrapy.Request(new_full_url, callback=self.parse)
-
-#configure_logging()
-#runner = CrawlerRunner()
-#runner.crawl(BaiduBaikeSpider)
-#runner.crawl(BaiduBaike2Spider)
-#d = runner.join()
-#d.addBoth(lambda _: reactor.stop())
-#
-#reactor.run()

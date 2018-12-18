@@ -34,11 +34,12 @@ class BaiduBaikeSpider(scrapy.Spider, object):
     def parse(self, response):
         # tooooo ugly,,,, but can not use defaultdict
         item = BaiduBaikeItem()
-        for sub_item in [ 'title', 'title_id', 'abstract', 'infobox', 'subject', 'disambi', 'interPic', 'interLink', 'exterLink', 'relateLemma']:
+        for sub_item in [ 'title', 'title_id', 'abstract', 'infobox', 'subject', 'disambi', 'redirect', 'curLink', 'interPic', 'interLink', 'exterLink', 'relateLemma']:
             item[sub_item] = None
 
         mainTitle = response.xpath("//dd[@class='lemmaWgt-lemmaTitle-title']/h1/text()").extract()
         subTitle = response.xpath("//dd[@class='lemmaWgt-lemmaTitle-title']/h2/text()").extract()
+        redirect_name = response.xpath("//span[@class='viewTip-fromTitle']/text()").extract()
         try:
             item['title'] = ' '.join(mainTitle)
         except:
@@ -47,6 +48,14 @@ class BaiduBaikeSpider(scrapy.Spider, object):
             item['disambi'] = ' '.join(mainTitle + subTitle)
         except:
             item['disambi'] = None
+        try:
+            item['redirect'] = ' '.join(redirect_name)
+        except:
+            item['redirect'] = None
+        try:
+            item['curLink'] = str(response.url)
+        except:
+            item['curLink'] = None
 
         soup = BeautifulSoup(response.text, 'lxml')
         summary_node = soup.find("div", class_ = "lemma-summary")
