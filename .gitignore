@@ -11,3 +11,8 @@ ie/deepdive/*.csv
 *.txt
 *.csv
 ie/craw/craw_all_baidu/craws/*
+ie/re_cnn_att/data/nyt/*.pyc
+ie/re_cnn_att/data/nyt/*.json
+ie/re_cnn_att/data/nyt/*.tsv
+ie/re_cnn_att/data/nyt/kb_manual/*
+ie/re_cnn_att/data/nyt/heldout_relations/*
