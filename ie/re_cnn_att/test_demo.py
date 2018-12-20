@@ -1,11 +1,9 @@
-#!/usr/bin/env python
-# coding=utf-8
-
 import nrekit
 import numpy as np
 import tensorflow as tf
 import sys
 import os
+import json
 
 dataset_name = 'nyt'
 if len(sys.argv) > 1:
@@ -29,24 +27,50 @@ test_loader = nrekit.data_loader.json_file_data_loader(os.path.join(dataset_dir,
 framework = nrekit.framework.re_framework(train_loader, test_loader)
 
 class model(nrekit.framework.re_model):
-    encoder = 'cnn'
-    selector = 'att'
+    encoder = "pcnn"
+    selector = "att"
 
     def __init__(self, train_data_loader, batch_size, max_length=120):
         nrekit.framework.re_model.__init__(self, train_data_loader, batch_size, max_length=max_length)
+        self.mask = tf.placeholder(dtype=tf.int32, shape=[None, max_length], name="mask")
         
         # Embedding
         x = nrekit.network.embedding.word_position_embedding(self.word, self.word_vec_mat, self.pos1, self.pos2)
 
-        # Encoder cnn
-        x_train = nrekit.network.encoder.cnn(x, keep_prob=0.5)
-        x_test = nrekit.network.encoder.cnn(x, keep_prob=1.0)
-	# Selector att
-        self._train_logit, train_repre = nrekit.network.selector.bag_attention(x_train, self.scope, self.ins_label, self.rel_tot, True, keep_prob=0.5)
-        self._test_logit, test_repre = nrekit.network.selector.bag_attention(x_test, self.scope, self.ins_label, self.rel_tot, False, keep_prob=1.0)
-	# Classifier
-        self._loss = nrekit.network.classifier.softmax_cross_entropy(self._train_logit, self.label, self.rel_tot, weights_table=self.get_weights())
+        # Encoder
+        if model.encoder == "pcnn":
+            x_train = nrekit.network.encoder.pcnn(x, self.mask, keep_prob=0.5)
+            x_test = nrekit.network.encoder.pcnn(x, self.mask, keep_prob=1.0)
+        elif model.encoder == "cnn":
+            x_train = nrekit.network.encoder.cnn(x, keep_prob=0.5)
+            x_test = nrekit.network.encoder.cnn(x, keep_prob=1.0)
+        elif model.encoder == "rnn":
+            x_train = nrekit.network.encoder.rnn(x, self.length, keep_prob=0.5)
+            x_test = nrekit.network.encoder.rnn(x, self.length, keep_prob=1.0)
+        elif model.encoder == "birnn":
+            x_train = nrekit.network.encoder.birnn(x, self.length, keep_prob=0.5)
+            x_test = nrekit.network.encoder.birnn(x, self.length, keep_prob=1.0)
+        else:
+            raise NotImplementedError
 
+        # Selector
+        if model.selector == "att":
+            self._train_logit, train_repre = nrekit.network.selector.bag_attention(x_train, self.scope, self.ins_label, self.rel_tot, True, keep_prob=0.5)
+            self._test_logit, test_repre = nrekit.network.selector.bag_attention(x_test, self.scope, self.ins_label, self.rel_tot, False, keep_prob=1.0)
+        elif model.selector == "ave":
+            self._train_logit, train_repre = nrekit.network.selector.bag_average(x_train, self.scope, self.rel_tot, keep_prob=0.5)
+            self._test_logit, test_repre = nrekit.network.selector.bag_average(x_test, self.scope, self.rel_tot, keep_prob=1.0)
+            self._test_logit = tf.nn.softmax(self._test_logit)
+        elif model.selector == "max":
+            self._train_logit, train_repre = nrekit.network.selector.bag_maximum(x_train, self.scope, self.ins_label, self.rel_tot, True, keep_prob=0.5)
+            self._test_logit, test_repre = nrekit.network.selector.bag_maximum(x_test, self.scope, self.ins_label, self.rel_tot, False, keep_prob=1.0)
+            self._test_logit = tf.nn.softmax(self._test_logit)
+        else:
+            raise NotImplementedError
+        
+        # Classifier
+        self._loss = nrekit.network.classifier.softmax_cross_entropy(self._train_logit, self.label, self.rel_tot, weights_table=self.get_weights())
+ 
     def loss(self):
         return self._loss
 
@@ -67,6 +91,13 @@ class model(nrekit.framework.re_model):
             print("Finish calculating")
         return weights_table
 
-framework.train(model, model_name=dataset_name + "_" + model.encoder + "_" + model.selector, max_epoch=60, ckpt_dir="checkpoint", gpu_nums=1)
+if len(sys.argv) > 2:
+    model.encoder = sys.argv[2]
+if len(sys.argv) > 3:
+    model.selector = sys.argv[3]
 
+auc, pred_result = framework.test(model, ckpt="./checkpoint/" + dataset_name + "_" + model.encoder + "_" + model.selector, return_result=True)
+
+with open('./test_result/' + dataset_name + "_" + model.encoder + "_" + model.selector + "_pred.json", 'w') as outfile:
+    json.dump(pred_result, outfile)
 
