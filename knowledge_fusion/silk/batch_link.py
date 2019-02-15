@@ -6,6 +6,22 @@ import commands
 import math
 from tqdm import tqdm
 from xml.etree import ElementTree
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--fuseki', type=str, 
+                    default='/home1/peng/project/apache-jena-fuseki-3.7.0/', help='Path to fuseki-server')
+parser.add_argument('--baiduNt', type=str ,
+                  default="/home1/peng/project/d2rq-0.8.1/full_nt/baidu_baike.nt" , help='Path to baidu N-triples ')
+parser.add_argument('--hudongNt', type=str ,
+                  default="/home1/peng/project/d2rq-0.8.1/full_nt/hudong_baike.nt" , help='Path to hudong N-triples')
+parser.add_argument('--maxNtLength', type=float ,
+                  default=5000000.0 , help='Max N-triples in each nt file')
+parser.add_argument('--ip', type=str ,
+                  default='localhost' , help='Ip for Fuseki and Silk server')
+parser.add_argument('--projectName', type=str ,
+                  default='baike' , help='Silk project name')
+args = parser.parse_args()
 
 class SilkCmd(object):
     def __init__(self):
@@ -19,7 +35,7 @@ class SilkCmd(object):
                    'Pragma': 'no-cache',
                    'Cache-Control': 'no-cache',
                   }
-    def control_linking(self, ip="10.3.10.194", project_name="baike_test",
+    def control_linking(self, ip=args.ip, project_name=args.projectName,
                         task_name="baike_test", action="start"):
         '''
         Control linking task
@@ -32,7 +48,7 @@ class SilkCmd(object):
         res = requests.post(url, json = {}, headers=self.header_dict)
         return res.text
     
-    def build_task(self, ip="10.3.10.194", project_name="baike_test",
+    def build_task(self, ip=args.ip, project_name=args.projectName,
                    task_name="baike_test", source_data="baidu_50",
                    target_data="hudong_50", output_data="output"):
         url = "http://{}:9000/workspace/projects/{}/tasks".format(ip, project_name)
@@ -44,7 +60,7 @@ class SilkCmd(object):
         res = requests.post(url, json = data_dict, headers=self.header_dict)
         return res.text
 
-    def build_endPoint(self, project_name, data_name, endpointURI, pageSize, ip="10.3.10.194"):
+    def build_endPoint(self, data_name, endpointURI, pageSize, ip=args.ip, project_name=args.projectName):
         url = "http://{}:9000/workspace/projects/{}/tasks".format(ip, project_name)
         data_dict = {"id":data_name,
                      "data":{"taskType":"Dataset","type":"sparqlEndpoint",
@@ -57,7 +73,7 @@ class SilkCmd(object):
         res = requests.post(url, json = data_dict, headers=self.header_dict)
         return res.text
 
-    def build_rdf(self, project_name, data_name, input_data, maxReadSize = "100000", ip="10.3.10.194"):
+    def build_rdf(self, data_name, input_data, maxReadSize = "100000", ip=args.ip, project_name=args.projectName):
         url = "http://{}:9000/workspace/projects/{}/tasks".format(ip, project_name)
         data_dict = {"id":data_name,
                      "data":{"taskType":"Dataset","type":"file",
@@ -67,7 +83,7 @@ class SilkCmd(object):
         res = requests.post(url, json = data_dict, headers=self.header_dict)
         return res.text
     
-    def build_output(self, project_name, data_name, ip="10.3.10.194"):
+    def build_output(self, data_name, ip=args.ip, project_name=args.projectName):
         url = "http://{}:9000/workspace/projects/{}/resources/{}".format(ip, project_name, data_name)
         res = requests.put(url, data = {}, headers=self.header_dict)
         return res.text
