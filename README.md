@@ -2,36 +2,41 @@
 从零开始的知识图谱生活
 
 # 简介
-从零开始搭建一个通用领域知识图谱，并实现基于该图谱的问答系统。目前已有节点 16,498,370个，关系 56,371,456个，属性 61,967,517个。<br>
+为了构建中文百科类知识图谱，我们参考漆桂林老师团队做的[zhishi.me](http://zhishi.me/)。目标是包含百度百科、互动百科、中文wiki百科的知识，千万级实体数量和亿级别的关系数目。目前已完成百度百科和互动百科部分，其中百度百科词条4,190,390条，互动百科词条4,382,575条。转换为RDF格式得到三元组 128,596,018个。存入 neo4j中得到节点 16,498,370个，关系 56,371,456个，属性 61,967,517个。<br>
 <p align="center">
 <img src="img/baike.png">
 <br/> cypher查询结果
 </p> 
 
 # 目录
+希望在该图谱上尝试应用以下技术：    
 
-* 获取数据
-   * 半结构化数据
+* [百度百科与互动百科的知识抽取](https://zhuanlan.zhihu.com/p/54051921)    
+   * 半结构化数据    
       * 百度百科爬虫   
       * 互动百科爬虫    
    * 非结构化数据
       * 微信公众号爬虫  
       * 虎嗅网爬虫    
       
-* 非结构化文本的知识抽取
-   * 基于Deepdive的知识抽取 
-   * 神经网络关系抽取
+* 非结构化文本的知识抽取    
+    * [基于Deepdive的知识抽取 ](https://zhuanlan.zhihu.com/p/46560845)    
+    * [制作类似于NYT的远程监督学习语料--baidu_6w](https://zhuanlan.zhihu.com/p/55643429)    
+    * [神经网络关系抽取](https://github.com/thunlp/OpenNRE)    
    
-* 结构化数据到 RDF   
-    * Direct Mapping    
-    * D2RQ: mapping 文件和 对应的NTriples 文件可以下载啦~您可以通过d2r-server进行查询使用  
+* 知识存储    
+    * [D2RQ 的使用](https://zhuanlan.zhihu.com/p/56440148)    
+    * [Jena 的使用](https://zhuanlan.zhihu.com/p/56449967)    
+    * [Neo4j 的使用](https://zhuanlan.zhihu.com/p/54061697)    
 
-* 知识存储
-   * 将数据存入 Neo4j
-
+* 知识融合    
+    * [Silk 实战](https://zhuanlan.zhihu.com/p/56519402)    
+* 自底向上的本体构建技术(TODO)    
+* 知识表示(TODO):    
+    * TransE    
+* 知识挖掘(TODO):    
 * KBQA    
     * 基于 REfO 的简单KBQA    
-    
 * 语义搜索
     * 基于elasticsearch 的简单语义搜索 支持实体检索、实体属性检索和条件检索
 
