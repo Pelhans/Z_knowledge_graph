@@ -22,7 +22,7 @@ class connec_mysql(object):
             host='localhost',
             user='root',
             passwd='nlp',
-            db='baidu_baike',
+            db='movie_baidu_baike',
             charset='utf8mb4',
             use_unicode=True
             )    
@@ -35,7 +35,7 @@ class connec_mysql(object):
             result = self.cursor.fetchall()
             max_id = result[0][0] if result[0][0] != None else 0
             print("max_id: ", max_id)
-            f = open(__package__ + "/../data/{}.txt".format(cate), "w+")
+            f = open("../data/total_val.txt", "w+")
             for id in range(1, max_id+1):
                 self.cursor.execute("SELECT * FROM {} WHERE {}_id = {}".format(cate, cate, id))
                 item_lists = self.cursor.fetchall()
