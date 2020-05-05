@@ -40,7 +40,7 @@ class connec_mysql(object):
             result = self.cursor.fetchall()
             max_id = result[0][0] if result[0][0] != None else 0
             print("max_id: ", max_id)
-            f = open("../data/baidu_baike.json", "w+")
+            f = open("../data/baidu_baike.json", "a")
             for id in range(1, max_id+1):
                 self.cursor.execute("SELECT * FROM {} WHERE {}_id = {}".format(cate, cate, id))
                 item_lists = self.cursor.fetchall()
@@ -54,17 +54,21 @@ class connec_mysql(object):
                 try:
                     assert len(item_lists[0]) == 14 or len(item_lists[0]) == 11
                     item_dict = defaultdict(list)
-                    item_dict["subj"] = str(item_lists[0][2])
+#                    item_dict = {}
+                    item_dict["subj"] = item_lists[0][2]
                     list_po = []
                     for i in range(1, len(item_lists[0])):
                         if column_attr[i] == "{}_chName".format(cate): # skip actor_chName
                             continue
                         tmp_dict = {}
-                        tmp_dict["pred"] = column_attr[i]
+                        tmp_dict["pred"] = column_attr[i].lower()
                         tmp_dict["obj"] = item_lists[0][i]
                         list_po.append(tmp_dict)
                     item_dict["po"] = list_po
+#                    print("item_dict: ", item_dict)
                     item_json = json.dumps(item_dict)
+#                    print("item_json: ", item_json)
+#                    break
                     f.write(item_json + "\n")
 
                 except Exception as e:

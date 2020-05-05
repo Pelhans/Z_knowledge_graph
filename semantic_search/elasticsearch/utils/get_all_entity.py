@@ -35,7 +35,7 @@ class connec_mysql(object):
             result = self.cursor.fetchall()
             max_id = result[0][0] if result[0][0] != None else 0
             print("max_id: ", max_id)
-            f = open("../data/all_entity.txt", "w+")
+            f = open("../data/all_entity.txt", "a")
             for id in range(1, max_id+1):
                 self.cursor.execute("SELECT * FROM {} WHERE {}_id = {}".format(cate, cate, id))
                 item_lists = self.cursor.fetchall()

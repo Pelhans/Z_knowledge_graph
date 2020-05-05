@@ -39,7 +39,7 @@ def search(question):
 
 def _parse_query(question):
     answer, query_type = "", None
-    question = question.upper()
+#    question = question.lower()
     question = question.replace(" ","")
     parts = re.split(u"：|:|<|>|<=|>=", question)
     en = _entity_linking(parts[0])
@@ -87,6 +87,8 @@ def _search_multihop_SP(parts):
     return v, 'done'
 
 def _search_multi_PO(exps, bool_ops):
+    # (u'exps: ', [u'movie_screenwriter:\u9ad8', u'movie_director:\u5468\u661f\u9a70'])
+    # (u'bool_ops: ', [u'AND'])
     ans_list = []
     po_list = []
     cmp_dir = {
@@ -391,9 +393,7 @@ def _generate_ngram_word(word_list_gen):
     args:
         word_list_gen: 一个字符串的迭代器
     '''
-    word_list = []
-    for w in word_list_gen:
-        word_list.append(w)
+    word_list = list(word_list_gen)
     n = len(word_list)
     ans = []
     for i in range(1, n+1):
@@ -404,9 +404,8 @@ def _generate_ngram_word(word_list_gen):
 def _entity_linking(entity_name):    #找出一个字符串中是否包含知识库中的实体，这里是字典匹配，可以用检索代替
     parts = re.split(r'的|是|有', entity_name)
     ans = []
-    ans1 = ""
     for p in parts:
-        pp = jieba.cut(p)
+        pp = list(jieba.cut(p))
         if pp is not None:
             for phrase in _generate_ngram_word(pp):
                 if phrase.encode('utf-8') in ent_dict:

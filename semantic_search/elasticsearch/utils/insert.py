@@ -2,15 +2,13 @@
 '''
 将一个知识图谱中的数据导入elastic search,须提前新建index和type
 '''
-try:
-    import simplejson as json
-except:
-    import json
+import json
 import sys
 import requests
 
 def bulk_insert(base_url, data):
     response = requests.post(base_url, headers={"Content-Type":"application/x-ndjson"}, data=data)
+    print("response: ", response)
 
 def begin_insert_job(index_name, type_name, json_filepath, bulk_size=1000):
     base_url = "http://localhost:9200/" + index_name + "/" + type_name + "/_bulk"
@@ -18,6 +16,7 @@ def begin_insert_job(index_name, type_name, json_filepath, bulk_size=1000):
     cnt, es_id = 0, 1
     data = ""
     for line in f:
+#        line = json.loads(line.strip())
         action_meta = '{"index": {"_id":"' + str(es_id) + '"}}'
         data = data + action_meta + "\n" + line
 
@@ -27,7 +26,7 @@ def begin_insert_job(index_name, type_name, json_filepath, bulk_size=1000):
             bulk_insert(base_url, data)
             cnt, data = 0, ""
         if not (es_id % bulk_size):
-            print es_id
+            print(es_id)
     if cnt:
         bulk_insert(base_url, data)
 

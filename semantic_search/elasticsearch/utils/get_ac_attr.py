@@ -12,6 +12,7 @@ def dump_ac_attr_dict(attr_mapping_file='../data/attr_mapping.txt', out_path='..
     for line in f:
         parts = line.strip().split(" ")
         for p in parts:
+            p = p.lower()
             if p != "": 
                 A.add_word(p,(i,p))
                 i += 1
