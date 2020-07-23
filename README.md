@@ -4,7 +4,7 @@
 # 简介
 为了构建中文百科类知识图谱，我们参考漆桂林老师团队做的[zhishi.me](http://zhishi.me/)。目标是包含百度百科、互动百科、中文wiki百科的知识，千万级实体数量和亿级别的关系数目。目前已完成百度百科和互动百科部分，其中百度百科词条4,190,390条，互动百科词条4,382,575条。转换为RDF格式得到三元组 128,596,018个。存入 neo4j中得到节点 16,498,370个，关系 56,371,456个，属性 61,967,517个。<br>
 
-[](img/baike.jpg)
+![百度百科知识图谱演示](http://pelhans.com/img/in-post/kg_neo4j_cypher/baidu_yanshi.png)
 
 # 目录
 希望在该图谱上尝试应用以下技术：    
@@ -65,6 +65,8 @@ Deepdive是由斯坦福大学InfoLab实验室开发的一个开源知识抽取�
 
 详细介绍请见[从零开始构建知识图谱（二）数据库到 RDF及 Jena的访问](http://pelhans.com/2019/02/11/kg_from_0_note10/)
 
+![D2RQ 示例](http://pelhans.com/img/in-post/kg_from_0/d2rq_web_view_lemmas.png)
+
 # 知识存储
 ## 将数据存入 Neo4j
 
@@ -80,10 +82,7 @@ Deepdive是由斯坦福大学InfoLab实验室开发的一个开源知识抽取�
 详细介绍请见[从零开始构建知识图谱（三）基于REfO的简单知识问答](http://pelhans.com/2018/11/06/kg_neo4j_cypher/)
 
 ### 示例
-<p align="center">
-<img src="img/example_REfO_KBQA.jpg">
-<br/> 基于REfO的KBQA
-</p> 
+![基于REfO 的 KBQA 示例](http://pelhans.com/img/in-post/kg_from_0/example_REfO_KBQA.png)
 
 # 语义搜索
 ## 基于elasticsearch 的简单语义搜索
@@ -93,4 +92,4 @@ Deepdive是由斯坦福大学InfoLab实验室开发的一个开源知识抽取�
 
 ### 示例
 
-![基于elasticsearch的简单语义搜索](img/example_elastic_ss.jpg)
+![基于elasticsearch的简单语义搜索](http://pelhans.com/img/in-post/kg_from_0/semantic.JPG)
