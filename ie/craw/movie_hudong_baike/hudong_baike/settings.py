@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for baidu_baike project
+# Scrapy settings for hudong_baike project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -9,14 +9,14 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'baidu_baike'
+BOT_NAME = 'hudong_baike'
 
-SPIDER_MODULES = ['baidu_baike.spiders']
-NEWSPIDER_MODULE = 'baidu_baike.spiders'
+SPIDER_MODULES = ['hudong_baike.spiders']
+NEWSPIDER_MODULE = 'hudong_baike.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'baidu_baike (+http://www.yourdomain.com)'
+#USER_AGENT = 'hudong_baike (+http://www.yourdomain.com)'
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -28,8 +28,8 @@ ROBOTSTXT_OBEY = False
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
 #DOWNLOAD_DELAY = 3
-#import random
-#DOWNLOAD_DELAY = random.randint(0, 1)
+import random
+DOWNLOAD_DELAY = random.randint(0, 1)
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
@@ -49,17 +49,17 @@ ROBOTSTXT_OBEY = False
 # Enable or disable spider middlewares
 # See https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'baidu_baike.middlewares.BaiduBaikeSpiderMiddleware': 543,
+#    'hudong_baike.middlewares.HudongBaikeSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'baidu_baike.middlewares.BaiduBaikeDownloaderMiddleware': 543,
+#    'hudong_baike.middlewares.HudongBaikeDownloaderMiddleware': 543,
 #}
 DOWNLOADER_MIDDLEWARES = {
-    'baidu_baike.middlewares.RandomUserAgent': 10,
-    'baidu_baike.middlewares.ProxyMiddleWare': 100,
+    'hudong_baike.middlewares.RandomUserAgent': 10,
+    'hudong_baike.middlewares.ProxyMiddleWare': 100,
 }
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
@@ -70,17 +70,17 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    'baidu_baike.pipelines.BaiduBaikePipeline': 300,
+#    'hudong_baike.pipelines.HudongBaikePipeline': 300,
 #}
 ITEM_PIPELINES = {     
-    'baidu_baike.pipelines.BaiduBaikePipeline': 300,
+    'hudong_baike.pipelines.HudongBaikePipeline': 300,
 }
  
 HOST_IP = 'localhost'  
 PORT = '3306'
 USER = 'root'
 PASSWD = 'nlp'
-DB_NAME = 'baidu_baike'
+DB_NAME = 'movie_hudong_baike'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

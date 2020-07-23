@@ -30,6 +30,7 @@ def dump_ac_attr_dict(attr_mapping_file, out_path):
     for line in f:
         parts = line.strip().split(" ")
         for p in parts:
+            p = p.upper()
             if p != "":
                 A.add_word(p,(i,p))
                 i += 1

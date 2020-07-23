@@ -155,4 +155,4 @@ class HudongBaikeSpider(scrapy.Spider, object):
         for link in new_urls:
             if link.startswith('http://www.baike.com/wiki'):
                 pass
-#                yield scrapy.Request(link, callback=self.parse)
+                yield scrapy.Request(link, callback=self.parse)

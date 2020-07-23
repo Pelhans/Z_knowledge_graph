@@ -35,7 +35,7 @@ class connec_mysql(object):
             result = self.cursor.fetchall()
             max_id = result[0][0] if result[0][0] != None else 0
             print("max_id: ", max_id)
-            f = open("../data/total_val.txt", "w+")
+            f = open("../data/all_entity.txt", "a")
             for id in range(1, max_id+1):
                 self.cursor.execute("SELECT * FROM {} WHERE {}_id = {}".format(cate, cate, id))
                 item_lists = self.cursor.fetchall()
@@ -48,10 +48,9 @@ class connec_mysql(object):
                     continue
                 try:
                     assert len(item_lists[0]) == 14 or len(item_lists[0]) == 11
-                    for i in range(1, len(item_lists[0])):
-                        if item_lists[0][i] == 'None':
-                            continue
-                        f.write(item_lists[0][i] + " " + column_attr[i] + "\n")
+                    if item_lists[0][2] == 'None':
+                        continue
+                    f.write(item_lists[0][2] + "\n")
 
                 except Exception as e:
                     print(e)
