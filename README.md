@@ -6,6 +6,16 @@
 
 ![百度百科知识图谱演示](http://pelhans.com/img/in-post/kg_neo4j_cypher/baidu_yanshi.png)
 
+# 资源下载
+
+[百度百科 SQL 文件下载 百度网盘 提取码 gcwa](http://pelhans.com/2018/09/04/kg_from_0_note4/)
+
+[互动百科 SQL 文件下载 百度网盘 提取码 rza6](https://link.zhihu.com/?target=https%3A//pan.baidu.com/s/1WqDW_trdIXxNBxqT1j733Q)
+
+[百度百科 Neo4j 文件下载 百度网盘 提取码 z6fj](https://link.zhihu.com/?target=https%3A//pan.baidu.com/s/1kUQLIb1TbHsWaIvYp-ncHQ)
+
+[互动百科 Neo4j 文件下载 百度网盘 提取码 kdkt](https://link.zhihu.com/?target=https%3A//pan.baidu.com/s/1Ba9oxM05fgCQw-cadPkhaw)
+
 # 目录
 希望在该图谱上尝试应用以下技术：    
 
@@ -16,7 +26,6 @@
    * 非结构化数据
       * 微信公众号爬虫  
       * 虎嗅网爬虫    
-      
 * 非结构化文本的知识抽取    
     * [制作类似于NYT的远程监督学习语料--baidu_6w](http://pelhans.com/2019/01/04/kg_from_0_note9/)    
     * [神经网络关系抽取](https://github.com/thunlp/OpenNRE)    
@@ -27,9 +36,9 @@
 * 知识融合    
     * [Silk 实战](http://pelhans.com/2019/02/12/kg_from_0_note12/)    
 * KBQA    
-    * 基于 REfO 的简单KBQA    
+    * [基于 REfO 的简单KBQA](http://pelhans.com/2018/09/03/kg_from_0_note3/)    
 * 语义搜索
-    * 基于elasticsearch 的简单语义搜索 支持实体检索、实体属性检索和条件检索
+    * [基于elasticsearch 的简单语义搜索 支持实体检索、实体属性检索和条件检索](http://pelhans.com/2018/09/04/kg_from_0_note4/)
 
 # 获取数据
 ## 半结构化数据
