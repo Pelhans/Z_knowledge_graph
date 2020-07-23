@@ -17,6 +17,9 @@ import re
 import urlparse
 import json
 
+from scrapy import optional_features
+optional_features.remove('boto')
+
 strong = re.compile(r".*?<strong>(.*?)</strong>.*?")
 span = re.compile(r".*?<span>(.*?)</span>.*?")
 hr = re.compile(r"<a href.*?/a>")
@@ -25,11 +28,11 @@ class CrawAllHudongSpider(scrapy.Spider, object):
     name = 'hudong'
     allowed_domains = ["baike.com"]
 #    start_urls = ['http://www.baike.com/wiki/%E4%B8%8A%E6%B5%B7%E5%B8%82'] # 上海
-#    start_urls = ['http://www.baike.com/wiki/%E6%82%AC%E5%B4%96%E7%A7%8B%E5%8D%83&prd=resoukuang'] # 星爷
+    start_urls = ['http://www.baike.com/wiki/%E6%82%AC%E5%B4%96%E7%A7%8B%E5%8D%83&prd=resoukuang'] # 星爷
 #    start_urls = ['http://so.baike.com/doc/%E7%BB%B3%E5%AD%90'] # 星爷
 #    start_urls = ['http://fenlei.baike.com/%E7%A7%91%E5%AD%A6/?prd=shouye_erjidaohang_fenleidaohang']
 #    start_urls = ['http://fenlei.baike.com/%E7%94%B7%E6%BC%94%E5%91%98/?prd=zhengwenye_left_kaifangfenlei']
-    start_urls = ['http://fenlei.baike.com/%E9%A1%B5%E9%9D%A2%E6%80%BB%E5%88%86%E7%B1%BB']
+#    start_urls = ['http://fenlei.baike.com/%E9%A1%B5%E9%9D%A2%E6%80%BB%E5%88%86%E7%B1%BB']
     
     def _get_from_findall(self, tag_list):
         result = []        
@@ -73,7 +76,7 @@ class CrawAllHudongSpider(scrapy.Spider, object):
             except:
                 item['curLink'] = None
     
-            soup = BeautifulSoup(response.text, 'lxml')
+            soup = BeautifulSoup(response.body, 'lxml')
             summary_node = soup.find("div", class_ = "summary")
             try:
                 item['abstract'] = summary_node.get_text().replace("\n"," ")
@@ -159,21 +162,21 @@ class CrawAllHudongSpider(scrapy.Spider, object):
     
             yield item
 
-#        soup = BeautifulSoup(response.text, 'lxml')
-#        links = soup.find_all('a', href=re.compile(r"/item/"))
-        seen_links = []
-        if response.url.find("so.baike") != -1:
-            result_list = response.xpath("//div[@class='result-list']/h3/a/@href").extract()
-        elif response.url.find("www.baike.com") != -1:
-            result_list = response.xpath("//a[@class='innerlink']/@href").extract()
-        elif response.url.find("baike") != -1:
-            result_list = response.xpath("//a/@href").extract()
-        seen_links.extend(result_list)
-
-        for link in seen_links:
-            if link.startswith("/wiki"):
-                link = urlparse.urljoin('http://www.baike.com/', link)
-            if link.find("baike") == -1:
-                continue
-#            print("@"*10, "link: ", link)
-            yield scrapy.Request(link, callback=self.parse)
+##        soup = BeautifulSoup(response.text, 'lxml')
+##        links = soup.find_all('a', href=re.compile(r"/item/"))
+#        seen_links = []
+#        if response.url.find("so.baike") != -1:
+#            result_list = response.xpath("//div[@class='result-list']/h3/a/@href").extract()
+#        elif response.url.find("www.baike.com") != -1:
+#            result_list = response.xpath("//a[@class='innerlink']/@href").extract()
+#        elif response.url.find("baike") != -1:
+#            result_list = response.xpath("//a/@href").extract()
+#        seen_links.extend(result_list)
+#
+#        for link in seen_links:
+#            if link.startswith("/wiki"):
+#                link = urlparse.urljoin('http://www.baike.com/', link)
+#            if link.find("baike") == -1:
+#                continue
+##            print("@"*10, "link: ", link)
+#            yield scrapy.Request(link, callback=self.parse)

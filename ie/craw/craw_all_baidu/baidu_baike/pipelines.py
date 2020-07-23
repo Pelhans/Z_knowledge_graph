@@ -28,6 +28,12 @@ class BaiduBaikePipeline(object):
             use_unicode=True
             )   
         self.cursor = self.conn.cursor()
+        self.cursor.execute("SELECT MAX(title_id) FROM lemmas")
+        max_id = self.cursor.fetchall()[0]
+        if None in max_id:
+            self.count = 1
+        else:
+            self.count = max_id[0]
 
     def process_item(self, item, spider):
         # process info for actor
@@ -48,12 +54,10 @@ class BaiduBaikePipeline(object):
 #        self.cursor.execute("SELECT disambi FROM lemmas;")
 #        disambi_list = self.cursor.fetchall()
 #        if (disambi,) not in disambi_list :
-        self.cursor.execute("SELECT MAX(title_id) FROM lemmas")
-        result = self.cursor.fetchall()[0]
-        if None in result:
-            title_id = 1
-        else:
-            title_id = result[0] + 1
+#        self.cursor.execute("SELECT MAX(title_id) FROM lemmas")
+#        result = self.cursor.fetchall()[0]
+        self.count += 1
+        title_id =  self.count
         sql = """
         INSERT INTO lemmas(title, title_id, abstract, infobox, subject, disambi, redirect, curLink, interPic, interLink, exterLink, relateLemma, all_text ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """

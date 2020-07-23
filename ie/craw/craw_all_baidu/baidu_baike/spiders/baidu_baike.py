@@ -21,8 +21,8 @@ class BaiduBaikeSpider(scrapy.Spider, object):
     name = 'baidu'
     allowed_domains = ["baike.baidu.com"]
 #    start_urls = ['https://baike.baidu.com/item/%E5%91%A8%E6%98%9F%E9%A9%B0/169917?fr=aladdin']
-    start_urls = ['https://baike.baidu.com/item/%E4%B8%8A%E6%B5%B7/114606'] # 上海
-#    start_urls = ['https://baike.baidu.com/item/%E4%B8%83%E5%B0%8F%E7%A6%8F']
+#    start_urls = ['https://baike.baidu.com/item/%E4%B8%8A%E6%B5%B7/114606'] # 上海
+    start_urls = ['https://baike.baidu.com/item/%E4%B8%83%E5%B0%8F%E7%A6%8F']
     
     def _get_from_findall(self, tag_list):
         result = []        
@@ -57,7 +57,8 @@ class BaiduBaikeSpider(scrapy.Spider, object):
         except:
             item['curLink'] = None
 
-        soup = BeautifulSoup(response.text, 'lxml')
+#        soup = BeautifulSoup(response.text, 'lxml')
+        soup = BeautifulSoup(response.body, 'lxml')
         summary_node = soup.find("div", class_ = "lemma-summary")
         try:
             item['abstract'] = summary_node.get_text().replace("\n"," ")
@@ -95,7 +96,8 @@ class BaiduBaikeSpider(scrapy.Spider, object):
             item['interPic'] = None
 
         inter_links_dict = {}
-        soup = BeautifulSoup(response.text, 'lxml')
+#        soup = BeautifulSoup(response.text, 'lxml')
+        soup = BeautifulSoup(response.body, 'lxml')
         inter_links = soup.find_all('a', href=re.compile(r"/item/"))
         for link in inter_links:
             new_url = link["href"]
@@ -108,7 +110,8 @@ class BaiduBaikeSpider(scrapy.Spider, object):
             item['interLink'] = None
         
         exter_links_dict = {}
-        soup = BeautifulSoup(response.text, 'lxml')
+#        soup = BeautifulSoup(response.text, 'lxml')
+        soup = BeautifulSoup(response.body, 'lxml')
         exterLink_links = soup.find_all('a', href=re.compile(r"/redirect/"))
         for link in exterLink_links:
             new_url = link["href"]
@@ -129,7 +132,8 @@ class BaiduBaikeSpider(scrapy.Spider, object):
 
         yield item
 
-        soup = BeautifulSoup(response.text, 'lxml')
+#        soup = BeautifulSoup(response.text, 'lxml')
+        soup = BeautifulSoup(response.body, 'lxml')
         links = soup.find_all('a', href=re.compile(r"/item/"))
         for link in links:
             new_url = link["href"]
