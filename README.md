@@ -10,7 +10,7 @@
 
 # 资源下载
 
-[百度百科 SQL 文件下载 百度网盘 提取码 gcwa](http://pelhans.com/2018/09/04/kg_from_0_note4/)
+[百度百科 SQL 文件下载 百度网盘 提取码 1234](https://pan.baidu.com/s/1D-aZdziYdh4FzPGT1lSB4A)
 
 [互动百科 SQL 文件下载 百度网盘 提取码 rza6](https://link.zhihu.com/?target=https%3A//pan.baidu.com/s/1WqDW_trdIXxNBxqT1j733Q)
 
